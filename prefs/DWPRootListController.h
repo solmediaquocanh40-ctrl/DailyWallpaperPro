@@ -1,7 +1,8 @@
-// DWPRootListController.h — DailyWallpaperPro 1.0.2
+// DWPRootListController.h — DailyWallpaperPro 1.0.3
 
 #import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>
+#import <Preferences/PSListItemsController.h>
 
 @interface DWPRootListController : PSListController
 - (void)applyNow:(id)sender;

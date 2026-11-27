@@ -1,4 +1,4 @@
-// DWPLogViewController.h — DailyWallpaperPro 1.0.2
+// DWPLogViewController.h — DailyWallpaperPro 1.0.3
 
 #import <UIKit/UIKit.h>
 #import <Preferences/PSSpecifier.h>

@@ -1,4 +1,4 @@
-# DailyWallpaper Pro 1.0.2
+# DailyWallpaper Pro 1.0.3
 
 Tweak `com.anhdang.dailywallpaperpro` cho iPhone 12 Pro / iOS 16.3.1 / Dopamine rootless
 (build đủ 3 scheme: rootless, rootful, roothide).
@@ -28,7 +28,7 @@ Tweak `com.anhdang.dailywallpaperpro` cho iPhone 12 Pro / iOS 16.3.1 / Dopamine 
 - **Xem nhật ký ngay trong Cài đặt** (mở / chia sẻ / xoá log), mục Trạng thái (nguồn +
   nơi đổi, số ảnh, lần đổi gần nhất), đặt lại mốc đổi, đặt lại toàn bộ cài đặt.
 
-## Trạng thái bản 1.0.2 — CẦN TEST MÁY THẬT
+## Trạng thái bản 1.0.3 — CẦN TEST MÁY THẬT
 
 Bằng chứng từ log máy thật của bản 1.0.1 (27/11/2026):
 
@@ -36,10 +36,10 @@ Bằng chứng từ log máy thật của bản 1.0.1 (27/11/2026):
   (`SBWallpaperController` không còn method `setWallpaperWithImage` nào).
 - Dump thật cho thấy đường của iOS 16: `wallpaperConfigurationManager` +
   `SBFWallpaperConfiguration.wallpaperImage` + `updateWallpaperForLocations:withCompletion:`.
-  Bản 1.0.2 đi đường này trước (E1), dump nay in **toàn bộ** method/property/ivar
+  Bản 1.0.3 đi đường này trước (E1), dump nay in **toàn bộ** method/property/ivar
   không lọc để vòng sau có đủ bằng chứng.
 - Vụ "không chọn được hình" ở 1.0.1: log không có bất kỳ dòng lưu ảnh nào và code cũ
-  có nhánh thất bại im lặng. Bản 1.0.2 ghi log **mọi bước** của picker (mở trang, trình
+  có nhánh thất bại im lặng. Bản 1.0.3 ghi log **mọi bước** của picker (mở trang, trình
   picker, số kết quả, tải từng ảnh, lưu từng ô), báo lỗi bằng hộp thoại, trình picker
   trễ sau action sheet, và có đường tải dữ liệu thô dự phòng.
 

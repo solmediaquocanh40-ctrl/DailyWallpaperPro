@@ -1,4 +1,4 @@
-// DWPRootListController.m — DailyWallpaperPro 1.0.2
+// DWPRootListController.m — DailyWallpaperPro 1.0.3
 // Trang Cai dat chinh: specifiers dung bang CODE de doi ngon ngu duoc
 // (Tieng Viet co dau mac dinh / English). Neu dung code loi thi tu lui ve
 // Root.plist (Tieng Viet) — trang khong bao gio trang trang.

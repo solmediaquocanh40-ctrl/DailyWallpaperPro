@@ -1,4 +1,4 @@
-// DWPPickerHelper.m — DailyWallpaperPro 1.0.2
+// DWPPickerHelper.m — DailyWallpaperPro 1.0.3
 
 #import "DWPPickerHelper.h"
 #import "../DWPShared.h"
