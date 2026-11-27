@@ -5,7 +5,7 @@ include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME := DailyWallpaperProPrefs
 DailyWallpaperProPrefs_FILES := DWPRootListController.m DWPPhotosController.m DWPLogViewController.m DWPPickerHelper.m ../DWPShared.m
-DailyWallpaperProPrefs_FRAMEWORKS := UIKit PhotosUI UniformTypeIdentifiers
+DailyWallpaperProPrefs_FRAMEWORKS := UIKit PhotosUI Photos UniformTypeIdentifiers
 DailyWallpaperProPrefs_INSTALL_PATH := /Library/PreferenceBundles
 DailyWallpaperProPrefs_CFLAGS := -fobjc-arc -I..
 DailyWallpaperProPrefs_LDFLAGS := -undefined dynamic_lookup

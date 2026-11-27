@@ -1,4 +1,4 @@
-// DWPShared.h — DailyWallpaperPro 1.0.3
+// DWPShared.h — DailyWallpaperPro 1.0.4
 // Hang so + ham dung chung giua tweak (SpringBoard) va trang Cai dat.
 
 #import <Foundation/Foundation.h>
@@ -7,7 +7,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define DWP_VERSION @"1.0.3"
+#define DWP_VERSION @"1.0.4"
 #define DWP_BUNDLE_ID @"com.anhdang.dailywallpaperpro"
 #define DWP_LOG_PATH @"/var/mobile/Documents/DailyWallpaperPro.log"
 #define DWP_SETTINGS_PATH @"/var/mobile/Documents/DailyWallpaperPro-Settings.plist"

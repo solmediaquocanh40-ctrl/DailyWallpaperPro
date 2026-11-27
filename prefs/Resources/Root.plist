@@ -8,7 +8,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>Tự đổi hình nền theo lịch tháng hoặc theo khoảng thời gian anh tự đặt.</string>
+			<string>Tự đổi hình nền theo lịch tháng hoặc theo khoảng thời gian anh tự đặt. Quản lý danh sách ảnh ngay trong trang này.</string>
 			<key>label</key>
 			<string>DailyWallpaper Pro</string>
 		</dict>
@@ -55,6 +55,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Ảnh: dùng bộ ảnh đã chọn. Màu trơn / Màu chuyển: không cần ảnh, hợp khi anh không muốn để hình nữa.</string>
 			<key>label</key>
 			<string>Nguồn nền</string>
 		</dict>
@@ -147,6 +149,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Theo lịch tháng: ngày mấy hiện ảnh ô ấy, tháng có bao nhiêu ngày thì chọn bấy nhiêu ảnh. Theo khoảng thời gian: hết khoảng là đổi tiếp. Tắt: chỉ dùng 1 nền cố định.</string>
 			<key>label</key>
 			<string>Kiểu tự đổi</string>
 		</dict>
@@ -207,6 +211,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Qua giờ này mỗi ngày, nền của ngày hôm đó mới được áp.</string>
 			<key>label</key>
 			<string>Giờ bắt đầu ngày (chế độ lịch tháng)</string>
 		</dict>
@@ -325,6 +331,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Ví dụ: 30 Phút, 24 Giờ, 48 Giờ, 2 Ngày, 1 Tháng.</string>
 			<key>label</key>
 			<string>Khoảng thời gian (chế độ khoảng thời gian)</string>
 		</dict>
@@ -404,7 +412,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Màu nền</string>
+			<string>Màu nền (nguồn Màu trơn / Màu chuyển)</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -451,6 +459,20 @@
 				<integer>10</integer>
 				<integer>11</integer>
 			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSEditTextCell</string>
+			<key>default</key>
+			<string></string>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>id</key>
+			<string>colorHex</string>
+			<key>key</key>
+			<string>colorHex</string>
+			<key>label</key>
+			<string>Màu tự nhập (#RRGGBB, trống = bảng màu)</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -512,7 +534,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Hiệu ứng ảnh</string>
+			<string>Hiệu ứng ảnh (chế độ ảnh)</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -594,6 +616,42 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
+			<string>Trạng thái</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSTitleValueCell</string>
+			<key>id</key>
+			<string>infoSource</string>
+			<key>key</key>
+			<string>infoSource</string>
+			<key>label</key>
+			<string>Nguồn + nơi đổi</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSTitleValueCell</string>
+			<key>id</key>
+			<string>infoPhotos</string>
+			<key>key</key>
+			<string>infoPhotos</string>
+			<key>label</key>
+			<string>Ảnh đã lưu</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSTitleValueCell</string>
+			<key>id</key>
+			<string>infoLast</string>
+			<key>key</key>
+			<string>infoLast</string>
+			<key>label</key>
+			<string>Lần đổi gần nhất</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
 			<string>Thao tác</string>
 		</dict>
 		<dict>
@@ -629,6 +687,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>DailyWallpaper Pro 1.0.4 — com.anhdang.dailywallpaperpro — Log: /var/mobile/Documents/DailyWallpaperPro.log</string>
 			<key>label</key>
 			<string>Cài đặt &amp; nhật ký</string>
 		</dict>
@@ -673,12 +733,6 @@
 			<string>resetAll</string>
 			<key>label</key>
 			<string>Đặt lại toàn bộ cài đặt</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>DailyWallpaper Pro 1.0.3 — com.anhdang.dailywallpaperpro — Log: /var/mobile/Documents/DailyWallpaperPro.log</string>
 		</dict>
 	</array>
 	<key>title</key>

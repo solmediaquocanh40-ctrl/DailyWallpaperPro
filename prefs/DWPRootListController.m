@@ -1,7 +1,10 @@
-// DWPRootListController.m — DailyWallpaperPro 1.0.3
-// Trang Cai dat chinh: specifiers dung bang CODE de doi ngon ngu duoc
-// (Tieng Viet co dau mac dinh / English). Neu dung code loi thi tu lui ve
-// Root.plist (Tieng Viet) — trang khong bao gio trang trang.
+// DWPRootListController.m — DailyWallpaperPro 1.0.4
+// Ban nay QUAY VE specifiers bang PLIST (duong da chung minh chay tot o
+// 1.0.1: doi gia tri, bam nut deu ngon). Ban 1.0.2/1.0.3 dung specifiers
+// bang code — log 1.0.3 cho thay trang dung duoc nhung khong co bat ky
+// dong "prefs: dat" nao (doi gia tri khong bao gio xong, khop loi anh bao
+// "an vo dau cung vang"). Song ngu bang 2 file plist: Root.plist (Tieng
+// Viet co dau) va RootEN.plist (English), chon theo khoa language.
 
 #import "DWPRootListController.h"
 #import "../DWPShared.h"
@@ -11,179 +14,21 @@
 #import <Preferences/PSSpecifier.h>
 #import <PhotosUI/PhotosUI.h>
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
-#import <objc/message.h>
 
 @interface DWPRootListController () <PHPickerViewControllerDelegate, UIDocumentPickerDelegate>
-- (NSMutableArray *)buildSpecifiers;
 - (void)showAlertTitle:(NSString *)title message:(NSString *)message;
 - (void)importSettingsFromURL:(NSURL *)url;
 @end
-
-// ---- Nha may specifier ----
-static PSSpecifier *DWPSpecGroup(id target, NSString *name, NSString *footer) {
-    PSSpecifier *spec = [PSSpecifier groupSpecifierWithName:name];
-    if (footer) [spec setProperty:footer forKey:@"footerText"];
-    return spec;
-}
-
-static void DWPSetKeyProps(PSSpecifier *spec, NSString *key, id def) {
-    [spec setProperty:key forKey:@"key"];
-    [spec setProperty:DWP_BUNDLE_ID forKey:@"defaults"];
-    if (def) [spec setProperty:def forKey:@"default"];
-    [spec setProperty:key forKey:@"id"];
-}
-
-static PSSpecifier *DWPSpecSwitch(id target, NSString *name, NSString *key, BOOL def) {
-    PSSpecifier *spec = [PSSpecifier preferenceSpecifierNamed:name target:target set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:nil cell:PSSwitchCell edit:nil];
-    DWPSetKeyProps(spec, key, @(def));
-    return spec;
-}
-
-static PSSpecifier *DWPSpecLinkList(id target, NSString *name, NSString *key, id def, NSArray *values, NSArray *titles) {
-    PSSpecifier *spec = [PSSpecifier preferenceSpecifierNamed:name target:target set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:[PSListItemsController class] cell:PSLinkListCell edit:nil];
-    DWPSetKeyProps(spec, key, def);
-    [spec setProperty:values forKey:@"validValues"];
-    [spec setProperty:titles forKey:@"validTitles"];
-    return spec;
-}
-
-static PSSpecifier *DWPSpecLink(id target, NSString *name, Class detailClass, NSString *sid) {
-    PSSpecifier *spec = [PSSpecifier preferenceSpecifierNamed:name target:target set:nil get:nil detail:detailClass cell:PSLinkCell edit:nil];
-    [spec setProperty:@YES forKey:@"isController"];
-    [spec setProperty:sid forKey:@"id"];
-    return spec;
-}
-
-static PSSpecifier *DWPSpecButton(id target, NSString *name, SEL action, NSString *sid) {
-    PSSpecifier *spec = [PSSpecifier preferenceSpecifierNamed:name target:target set:nil get:nil detail:nil cell:PSButtonCell edit:nil];
-    [spec setProperty:sid forKey:@"id"];
-    if ([spec respondsToSelector:@selector(setButtonAction:)]) {
-        ((void (*)(id, SEL, SEL))objc_msgSend)(spec, @selector(setButtonAction:), action);
-    } else {
-        [spec setProperty:NSStringFromSelector(action) forKey:@"action"];
-    }
-    return spec;
-}
-
-static PSSpecifier *DWPSpecValue(id target, NSString *name, NSString *key) {
-    PSSpecifier *spec = [PSSpecifier preferenceSpecifierNamed:name target:target set:nil get:@selector(readPreferenceValue:) detail:nil cell:PSTitleValueCell edit:nil];
-    [spec setProperty:key forKey:@"key"];
-    [spec setProperty:key forKey:@"id"];
-    return spec;
-}
-
-static PSSpecifier *DWPSpecEditText(id target, NSString *name, NSString *key, NSString *def) {
-    PSSpecifier *spec = [PSSpecifier preferenceSpecifierNamed:name target:target set:@selector(setPreferenceValue:specifier:) get:@selector(readPreferenceValue:) detail:nil cell:PSEditTextCell edit:nil];
-    DWPSetKeyProps(spec, key, def);
-    return spec;
-}
 
 @implementation DWPRootListController
 
 - (NSArray *)specifiers {
     if (!_specifiers) {
-        NSMutableArray *built = nil;
-        @try { built = [self buildSpecifiers]; } @catch (NSException *e) {
-            DWPLog(@"prefs: dung specifiers bang code THAT BAI (%@: %@) — lui ve Root.plist", e.name, e.reason);
-            built = nil;
-        }
-        if (built.count > 0) _specifiers = built;
-        else _specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
+        NSString *plistName = (DWPLanguage() == 1) ? @"RootEN" : @"Root";
+        _specifiers = [self loadSpecifiersFromPlistName:plistName target:self];
+        DWPLog(@"prefs: da nap specifiers tu %@.plist (%lu muc)", plistName, (unsigned long)_specifiers.count);
     }
     return _specifiers;
-}
-
-- (NSMutableArray *)buildSpecifiers {
-    NSMutableArray *items = [NSMutableArray array];
-    BOOL en = (DWPLanguage() == 1);
-
-    [items addObject:DWPSpecGroup(self, @"DailyWallpaper Pro",
-        DWPT(@"Tự đổi hình nền theo lịch tháng hoặc theo khoảng thời gian anh tự đặt. Quản lý danh sách ảnh ngay trong trang này.",
-             @"Auto-change wallpaper by calendar month or by a custom interval. Manage the photo list right here."))];
-    [items addObject:DWPSpecSwitch(self, DWPT(@"Bật DailyWallpaper Pro", @"Enable DailyWallpaper Pro"), DWPKeyEnabled, YES)];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Ngôn ngữ", @"Language"), DWPKeyLanguage, @0, @[@0, @1], @[@"Tiếng Việt", @"English"])];
-
-    [items addObject:DWPSpecGroup(self, DWPT(@"Nguồn nền", @"Wallpaper source"),
-        DWPT(@"Ảnh: dùng bộ ảnh đã chọn. Màu trơn / Màu chuyển: không cần ảnh, hợp khi anh không muốn để hình nữa.",
-             @"Photos: use the picked set. Solid / Gradient: no photos needed."))];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Nguồn nền", @"Source"), DWPKeySourceMode, @0, @[@0, @1, @2],
-        en ? @[@"Photos", @"Solid color", @"Gradient"] : @[@"Ảnh đã chọn", @"Màu trơn", @"Màu chuyển (gradient)"])];
-    [items addObject:DWPSpecLink(self, DWPT(@"Quản lý danh sách ảnh", @"Manage photo list"), [DWPPhotosController class], @"photos")];
-    [items addObject:DWPSpecButton(self, DWPT(@"Chọn bộ ảnh ngay tại đây (đường dự phòng)", @"Pick photo set right here (fallback)"), @selector(pickPhotosFallback:), @"pickFallback")];
-
-    [items addObject:DWPSpecGroup(self, DWPT(@"Nơi đổi hình nền", @"Where to change"),
-        DWPT(@"Both nghĩa là đổi cả màn hình khoá và màn hình chính cùng một nền.", @"Both changes lock screen and home screen together."))];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Đổi ở đâu", @"Change on"), DWPKeyTarget, @2, @[@0, @1, @2],
-        en ? @[@"Lock screen only", @"Home screen only", @"Both"] : @[@"Chỉ màn hình khoá", @"Chỉ màn hình chính", @"Cả hai (Both)"])];
-
-    [items addObject:DWPSpecGroup(self, DWPT(@"Kiểu tự đổi", @"Auto-change style"),
-        DWPT(@"Theo lịch tháng: ngày mấy hiện ảnh ô ấy, tháng có bao nhiêu ngày thì chọn bấy nhiêu ảnh. Theo khoảng thời gian: hết khoảng là đổi tiếp. Tắt: chỉ dùng 1 nền cố định.",
-             @"Calendar: day N shows slot N. Interval: advance when the interval elapses. Off: one fixed wallpaper."))];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Kiểu tự đổi", @"Style"), DWPKeyRotationMode, @0, @[@0, @1, @2],
-        en ? @[@"By calendar month", @"By custom interval", @"Off — single wallpaper"] : @[@"Theo lịch tháng", @"Theo khoảng thời gian tự đặt", @"Tắt — chỉ dùng 1 nền"])];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Thứ tự (chế độ khoảng thời gian)", @"Order (interval mode)"), DWPKeyOrderMode, @0, @[@0, @1],
-        en ? @[@"Sequential 1, 2, 3...", @"Random"] : @[@"Lần lượt 1, 2, 3...", @"Ngẫu nhiên"])];
-
-    NSMutableArray *hourTitles = [NSMutableArray array];
-    NSMutableArray *hourValues = [NSMutableArray array];
-    for (NSInteger h = 0; h < 24; h++) {
-        [hourValues addObject:@(h)];
-        [hourTitles addObject:en ? [NSString stringWithFormat:@"%ld:00", (long)h] : [NSString stringWithFormat:@"%ld giờ", (long)h]];
-    }
-    NSArray *minValues = @[@0, @5, @10, @15, @20, @30, @40, @45, @50, @55];
-    NSMutableArray *minTitles = [NSMutableArray array];
-    for (NSNumber *m in minValues) [minTitles addObject:[NSString stringWithFormat:@"%02ld %@", (long)[m integerValue], en ? @"min" : @"phút"]];
-    [items addObject:DWPSpecGroup(self, DWPT(@"Giờ bắt đầu ngày (chế độ lịch tháng)", @"Day start time (calendar mode)"),
-        DWPT(@"Qua giờ này mỗi ngày, nền của ngày hôm đó mới được áp.", @"The day's wallpaper applies after this time."))];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Giờ bắt đầu", @"Start hour"), DWPKeyScheduleHour, @0, hourValues, hourTitles)];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Phút bắt đầu", @"Start minute"), DWPKeyScheduleMinute, @0, minValues, minTitles)];
-
-    [items addObject:DWPSpecGroup(self, DWPT(@"Khoảng thời gian (chế độ khoảng thời gian)", @"Interval (interval mode)"),
-        DWPT(@"Ví dụ: 30 Phút, 24 Giờ, 48 Giờ, 2 Ngày, 1 Tháng.", @"Examples: 30 Minutes, 24 Hours, 48 Hours, 2 Days, 1 Month."))];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Mỗi (số)", @"Every (amount)"), DWPKeyIntervalValue, @1, @[@1, @2, @3, @5, @10, @15, @30, @45, @48, @60],
-        @[@"1", @"2", @"3", @"5", @"10", @"15", @"30", @"45", @"48", @"60"])];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Đơn vị", @"Unit"), DWPKeyIntervalUnit, @2, @[@0, @1, @2, @3],
-        en ? @[@"Minutes", @"Hours", @"Days", @"Months"] : @[@"Phút", @"Giờ", @"Ngày", @"Tháng"])];
-
-    NSArray *colorNamesVI = @[@"Đen", @"Trắng", @"Xám", @"Đỏ", @"Cam", @"Vàng", @"Xanh lá", @"Xanh biển", @"Xanh navy", @"Tím", @"Hồng", @"Nâu"];
-    NSArray *colorNamesEN = @[@"Black", @"White", @"Gray", @"Red", @"Orange", @"Yellow", @"Green", @"Blue", @"Navy", @"Purple", @"Pink", @"Brown"];
-    NSMutableArray *colorValues = [NSMutableArray array];
-    for (NSInteger i = 0; i < 12; i++) [colorValues addObject:@(i)];
-    NSArray *gradNamesVI = @[@"Hoàng hôn", @"Biển", @"Rừng", @"Tím mộng", @"Đêm"];
-    NSArray *gradNamesEN = @[@"Sunset", @"Ocean", @"Forest", @"Purple dream", @"Night"];
-    [items addObject:DWPSpecGroup(self, DWPT(@"Màu nền (nguồn Màu trơn / Màu chuyển)", @"Colors (Solid / Gradient source)"), nil)];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Màu trơn trong bảng màu", @"Solid color (palette)"), DWPKeyColorIndex, @8, colorValues, en ? colorNamesEN : colorNamesVI)];
-    [items addObject:DWPSpecEditText(self, DWPT(@"Màu tự nhập (#RRGGBB, trống = bảng màu)", @"Custom color (#RRGGBB, empty = palette)"), DWPKeyColorHex, @"")];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Bộ màu chuyển", @"Gradient set"), DWPKeyGradientIndex, @0, @[@0, @1, @2, @3, @4], en ? gradNamesEN : gradNamesVI)];
-    [items addObject:DWPSpecSwitch(self, DWPT(@"Tự đổi màu theo lịch/khoảng như đổi ảnh", @"Rotate colors on schedule like photos"), DWPKeyColorRotate, NO)];
-    [items addObject:DWPSpecButton(self, DWPT(@"Áp màu / gradient ngay để thử", @"Apply color / gradient now (test)"), @selector(testColor:), @"testColor")];
-
-    [items addObject:DWPSpecGroup(self, DWPT(@"Hiệu ứng ảnh (chế độ ảnh)", @"Photo effects (photo source)"), nil)];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Phủ tối (dễ đọc chữ/icon)", @"Dark overlay (readability)"), DWPKeyDarkenPercent, @0, @[@0, @10, @20, @30, @40],
-        @[@"0%", @"10%", @"20%", @"30%", @"40%"])];
-    [items addObject:DWPSpecLinkList(self, DWPT(@"Làm mờ ảnh", @"Blur photo"), DWPKeyBlurLevel, @0, @[@0, @1, @2, @3],
-        en ? @[@"None", @"Light", @"Medium", @"Strong"] : @[@"Không", @"Nhẹ", @"Vừa", @"Mạnh"])];
-    [items addObject:DWPSpecSwitch(self, DWPT(@"Pin yếu thì tạm không đổi (dưới 20%, không sạc)", @"Skip change on low battery (under 20%, not charging)"), DWPKeyLowBatteryGuard, NO)];
-
-    [items addObject:DWPSpecGroup(self, DWPT(@"Trạng thái", @"Status"), nil)];
-    [items addObject:DWPSpecValue(self, DWPT(@"Nguồn + nơi đổi", @"Source + target"), @"infoSource")];
-    [items addObject:DWPSpecValue(self, DWPT(@"Ảnh đã lưu", @"Saved photos"), @"infoPhotos")];
-    [items addObject:DWPSpecValue(self, DWPT(@"Lần đổi gần nhất", @"Last change"), @"infoLast")];
-
-    [items addObject:DWPSpecGroup(self, DWPT(@"Thao tác", @"Actions"), nil)];
-    [items addObject:DWPSpecButton(self, DWPT(@"Đổi nền ngay bây giờ", @"Change wallpaper now"), @selector(applyNow:), @"applyNow")];
-    [items addObject:DWPSpecButton(self, DWPT(@"Test engine đổi nền (ảnh đỏ DWP TEST)", @"Test wallpaper engine (red DWP TEST image)"), @selector(testEngine:), @"testEngine")];
-    [items addObject:DWPSpecButton(self, DWPT(@"Đặt lại mốc đổi", @"Reset change timer"), @selector(resetState:), @"resetState")];
-
-    [items addObject:DWPSpecGroup(self, DWPT(@"Cài đặt & nhật ký", @"Settings & log"),
-        [NSString stringWithFormat:@"DailyWallpaper Pro %@ — com.anhdang.dailywallpaperpro — Log: /var/mobile/Documents/DailyWallpaperPro.log", DWP_VERSION])];
-    [items addObject:DWPSpecButton(self, DWPT(@"Xuất file cài đặt", @"Export settings file"), @selector(exportSettings:), @"exportSettings")];
-    [items addObject:DWPSpecButton(self, DWPT(@"Nhập file cài đặt", @"Import settings file"), @selector(importSettings:), @"importSettings")];
-    [items addObject:DWPSpecLink(self, DWPT(@"Xem nhật ký (log)", @"View log"), [DWPLogViewController class], @"logView")];
-    [items addObject:DWPSpecButton(self, DWPT(@"Đặt lại toàn bộ cài đặt", @"Reset all settings"), @selector(resetAll:), @"resetAll")];
-
-    DWPLog(@"prefs: da dung %lu specifiers bang code (ngon ngu %ld)", (unsigned long)items.count, (long)DWPLanguage());
-    return items;
 }
 
 - (id)readPreferenceValue:(PSSpecifier *)specifier {

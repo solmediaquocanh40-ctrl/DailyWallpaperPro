@@ -1,4 +1,4 @@
-// DWPEngine.m — DailyWallpaperPro 1.0.3
+// DWPEngine.m — DailyWallpaperPro 1.0.4
 
 #import "DWPEngine.h"
 #import "DWPShared.h"
