@@ -1,4 +1,4 @@
-// DWPRootListController.m — DailyWallpaperPro 1.0.8
+// DWPRootListController.m — DailyWallpaperPro 1.0.10
 // Ban nay QUAY VE specifiers bang PLIST (duong da chung minh chay tot o
 // 1.0.1: doi gia tri, bam nut deu ngon). Ban 1.0.2/1.0.3 dung specifiers
 // bang code — log 1.0.3 cho thay trang dung duoc nhung khong co bat ky
@@ -102,6 +102,18 @@
     DWPPostDarwin(DWP_NOTIFY_TESTCOLOR);
     [self showAlertTitle:DWPT(@"Đã gửi lệnh áp màu", @"Color apply sent")
                  message:DWPT(@"Anh coi nền có đổi sang màu/gradient đang chọn không rồi gửi em log.", @"Check whether the wallpaper turned to the chosen color/gradient, then send me the log.")];
+}
+
+- (void)openPhotos:(id)sender {
+    DWPLog(@"prefs: mo trang Quan ly danh sach anh");
+    DWPPhotosController *vc = [[DWPPhotosController alloc] init];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)viewLog:(id)sender {
+    DWPLog(@"prefs: mo trang Xem nhat ky");
+    DWPLogViewController *vc = [[DWPLogViewController alloc] init];
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)resetState:(id)sender {

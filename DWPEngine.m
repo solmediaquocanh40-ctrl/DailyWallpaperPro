@@ -1,4 +1,4 @@
-// DWPEngine.m — DailyWallpaperPro 1.0.8
+// DWPEngine.m — DailyWallpaperPro 1.0.10
 
 #import "DWPEngine.h"
 #import "DWPShared.h"
@@ -15,7 +15,6 @@
 - (void)setWallpaperVariant:(NSInteger)variant withConfiguration:(id)configuration;
 - (id)wallpaperConfigurationManager;
 - (void)updateWallpaperForLocations:(NSInteger)locations withCompletion:(id)completion;
-- (void)_updateForLockScreenPosterConfiguration:(id)lockConfiguration homeScreenPosterConfiguration:(id)homeConfiguration;
 - (void)wallpaperServer:(id)server setWallpaperColor:(id)color darkColor:(id)darkColor forVariants:(id)variants completionHandler:(id)handler;
 @end
 
@@ -25,6 +24,17 @@
 
 @interface SBFWallpaperConfiguration : NSObject
 - (instancetype)initWithVariant:(NSInteger)variant;
+@end
+
+// Manager that tren iOS 16.3.1 (dump 1.0.10): PBUIWallpaperConfigurationManager
+// — chua API ghi anh that vao kho nen cua he thong.
+@interface PBUIWallpaperConfigurationManager : NSObject
+- (id)wallpaperConfigurationForVariant:(NSInteger)variant includingValuesForTypes:(NSInteger)types;
+- (void)setWallpaperImage:(UIImage *)image adjustedImage:(UIImage *)adjustedImage thumbnailData:(NSData *)thumbnailData imageHashData:(NSData *)imageHashData wallpaperOptions:(id)wallpaperOptions forVariants:(NSIndexSet *)variants wallpaperMode:(NSInteger)wallpaperMode;
+- (void)wallpaperDidChangeForVariants:(NSIndexSet *)variants shouldNotify:(BOOL)shouldNotify;
+- (void)beginChangeBatch;
+- (void)endChangeBatch;
+- (NSInteger)wallpaperMode;
 @end
 
 @implementation DWPEngine
@@ -139,41 +149,82 @@
     });
 }
 
-// Duong E2 (1.0.8, theo dump 1.0.7): SBWallpaperController co method noi bo
-// _updateForLockScreenPosterConfiguration:homeScreenPosterConfiguration: —
-// duong he thong tu dung khi poster thay doi. Gan anh vao config cua tung
-// phia roi dua ca 2 config cho controller tu ap (phia khong doi thi dua
-// config hien tai nguyen ven).
-+ (BOOL)applyViaPosterUpdate:(SBWallpaperController *)controller manager:(id)manager image:(UIImage *)image target:(NSInteger)target {
-    SEL sel = @selector(_updateForLockScreenPosterConfiguration:homeScreenPosterConfiguration:);
-    if (![controller respondsToSelector:sel]) {
-        DWPLog(@"engine E2: controller khong co _updateForLockScreenPosterConfiguration, bo qua");
+// Duong E3 (1.0.10, theo dump 1.0.8): PBUIWallpaperConfigurationManager co
+// API ghi anh that vao kho nen cua he thong:
+//   setWallpaperImage:adjustedImage:thumbnailData:imageHashData:
+//   wallpaperOptions:forVariants:wallpaperMode:
+// Day la method cua CHINH manager (cung ho PaperBoardUI voi config no
+// quan ly) — khac han E2 da gay Safe Mode (E2 dua config cua manager nay
+// cho SBWallpaperController nhan nham kieu poster configuration).
+// CHI chay qua applyImageExperimental (nut Test), khong chay tu dong.
++ (BOOL)applyViaManagerSetImage:(SBWallpaperController *)controller image:(UIImage *)image target:(NSInteger)target {
+    if (![controller respondsToSelector:@selector(wallpaperConfigurationManager)]) {
+        DWPLog(@"engine E3: controller khong co wallpaperConfigurationManager, bo qua");
         return NO;
     }
-    id lockCfg = [self fetchConfiguration:manager variant:0];
-    id homeCfg = [self fetchConfiguration:manager variant:1];
-    if (!lockCfg && !homeCfg) { DWPLog(@"engine E2: khong lay duoc config nao, bo qua"); return NO; }
-    BOOL setAny = NO;
-    if ((target == 0 || target == 2) && lockCfg) {
-        @try { [lockCfg setValue:image forKey:@"wallpaperImage"]; setAny = YES; DWPLog(@"engine E2: da gan anh vao config KHOA (variant 0)"); }
-        @catch (NSException *e) { DWPLog(@"engine E2: gan anh config khoa THAT BAI %@: %@", e.name, e.reason); }
+    id rawManager = nil;
+    @try { rawManager = [controller wallpaperConfigurationManager]; } @catch (NSException *e) { rawManager = nil; }
+    if (!rawManager) { DWPLog(@"engine E3: manager = nil"); return NO; }
+    Class pbuiCls = objc_getClass("PBUIWallpaperConfigurationManager");
+    if (!pbuiCls || ![rawManager isKindOfClass:pbuiCls]) {
+        DWPLog(@"engine E3: manager class %@ khong phai PBUIWallpaperConfigurationManager, dung cho an toan", NSStringFromClass([rawManager class]));
+        return NO;
     }
-    if ((target == 1 || target == 2) && homeCfg) {
-        @try { [homeCfg setValue:image forKey:@"wallpaperImage"]; setAny = YES; DWPLog(@"engine E2: da gan anh vao config CHINH (variant 1)"); }
-        @catch (NSException *e) { DWPLog(@"engine E2: gan anh config chinh THAT BAI %@: %@", e.name, e.reason); }
+    PBUIWallpaperConfigurationManager *manager = (PBUIWallpaperConfigurationManager *)rawManager;
+    SEL setSel = @selector(setWallpaperImage:adjustedImage:thumbnailData:imageHashData:wallpaperOptions:forVariants:wallpaperMode:);
+    if (![manager respondsToSelector:setSel]) {
+        DWPLog(@"engine E3: manager khong co setWallpaperImage:..., bo qua");
+        return NO;
     }
-    if (!setAny) return NO;
+    NSInteger mode = 0;
+    @try { mode = [manager wallpaperMode]; } @catch (NSException *e) { mode = 0; }
+    NSInteger firstVariant = (target == 1) ? 1 : 0;
+    id cfg = [self fetchConfiguration:manager variant:firstVariant];
+    id options = nil;
+    @try { options = [cfg valueForKey:@"wallpaperOptions"]; } @catch (NSException *e) { options = nil; }
+    CGSize ts = CGSizeMake(270, 480);
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:ts];
+    UIImage *thumb = [renderer imageWithActions:^(UIGraphicsImageRendererContext *ctx) {
+        [image drawInRect:CGRectMake(0, 0, ts.width, ts.height)];
+    }];
+    NSData *thumbData = UIImageJPEGRepresentation(thumb, 0.8);
+    NSData *fullData = UIImageJPEGRepresentation(image, 0.85);
+    NSMutableIndexSet *variants = [NSMutableIndexSet indexSet];
+    if (target == 0 || target == 2) [variants addIndex:0];
+    if (target == 1 || target == 2) [variants addIndex:1];
+    DWPLog(@"engine E3: chuan bi setWallpaperImage (mode %ld, variants %@, thumb %lu byte, full %lu byte, options %@)",
+           (long)mode, variants, (unsigned long)thumbData.length, (unsigned long)fullData.length,
+           options ? NSStringFromClass([options class]) : @"nil");
     @try {
-        [controller _updateForLockScreenPosterConfiguration:lockCfg homeScreenPosterConfiguration:homeCfg];
-        DWPLog(@"engine E2: da goi _updateForLockScreenPosterConfiguration (lock=%@, home=%@)",
-               lockCfg ? @"co" : @"nil", homeCfg ? @"co" : @"nil");
+        if ([manager respondsToSelector:@selector(beginChangeBatch)]) [manager beginChangeBatch];
+        [manager setWallpaperImage:image adjustedImage:image thumbnailData:thumbData
+                   imageHashData:fullData wallpaperOptions:options
+                     forVariants:variants wallpaperMode:mode];
+        if ([manager respondsToSelector:@selector(endChangeBatch)]) [manager endChangeBatch];
+        DWPLog(@"engine E3: da goi setWallpaperImage — khong loi luc chay");
     } @catch (NSException *e) {
-        DWPLog(@"engine E2: goi update poster NGOAI LE %@: %@", e.name, e.reason);
+        DWPLog(@"engine E3: NGOAI LE %@: %@", e.name, e.reason);
         return NO;
     }
-    if (target == 0 || target == 2) [self readBackConfiguration:manager variant:0 appliedImage:image tag:@"E2"];
-    if (target == 1 || target == 2) [self readBackConfiguration:manager variant:1 appliedImage:image tag:@"E2"];
+    @try {
+        if ([manager respondsToSelector:@selector(wallpaperDidChangeForVariants:shouldNotify:)]) {
+            [manager wallpaperDidChangeForVariants:variants shouldNotify:YES];
+            DWPLog(@"engine E3: da goi wallpaperDidChangeForVariants:shouldNotify:YES");
+        }
+    } @catch (NSException *e) {
+        DWPLog(@"engine E3: wallpaperDidChange NGOAI LE %@: %@", e.name, e.reason);
+    }
+    if (target == 0 || target == 2) [self readBackConfiguration:manager variant:0 appliedImage:image tag:@"E3"];
+    if (target == 1 || target == 2) [self readBackConfiguration:manager variant:1 appliedImage:image tag:@"E3"];
     return YES;
+}
+
++ (BOOL)applyImageExperimental:(UIImage *)image target:(NSInteger)target {
+    if (!image) { DWPLog(@"engine E3: anh nil, dung"); return NO; }
+    SBWallpaperController *controller = [self sharedController];
+    if (!controller) return NO;
+    DWPLog(@"engine: nut Test dang thu duong E3 (target %ld)", (long)target);
+    return [self applyViaManagerSetImage:controller image:image target:target];
 }
 
 // Duong E1 (moi, theo dump 1.0.1): lay configuration hien tai cua tung variant
@@ -263,12 +314,7 @@
     BOOL ok = NO;
     ok = [self applyViaConfiguration:controller image:image target:target] || ok;
 
-    // Duong E2 (1.0.8): dua thang 2 poster configuration cho controller tu ap
-    if ([controller respondsToSelector:@selector(wallpaperConfigurationManager)]) {
-        id mgr = nil;
-        @try { mgr = [controller wallpaperConfigurationManager]; } @catch (NSException *e) { mgr = nil; }
-        if (mgr) ok = [self applyViaPosterUpdate:controller manager:mgr image:image target:target] || ok;
-    }
+    // (E2 da bi XOA o 1.0.9 — gay Safe Mode, xem .ips 2026-11-27 16:18.)
 
     // Cac duong legacy (1.0.1 da chung minh khong ton tai tren iOS 16.3.1,
     // giu lai re vi chi la respondsToSelector — ban sau se bo han neu E1 dung).

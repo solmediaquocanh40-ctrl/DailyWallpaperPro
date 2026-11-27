@@ -1,4 +1,4 @@
-// Tweak.x — DailyWallpaperPro 1.0.8 (com.anhdang.dailywallpaperpro)
+// Tweak.x — DailyWallpaperPro 1.0.10 (com.anhdang.dailywallpaperpro)
 // Chay trong SpringBoard: dong ho kiem tra moi 60 giay + thong bao Darwin
 // tu trang Cai dat (doi ngay / test engine / test mau). Khong hook class nao —
 // toan bo viec doi nen nam o DWPEngine (do API luc chay, ghi log tung duong).
@@ -27,6 +27,8 @@ static void DWPOnApplyNow(CFNotificationCenterRef center, void *observer, CFStri
 static void DWPOnTestEngine(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo);
 static void DWPOnTestColor(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo);
 static UIImage *DWPTestImage(void);
+
+static BOOL gDWPTestExperimental = NO;
 
 static void DWPMarkApplied(NSInteger slotOrColor) {
     NSDate *now = [NSDate date];
@@ -138,7 +140,8 @@ static void DWPApplyColorLike(NSInteger forcedIndex, NSString *reason, BOOL forc
     } else {
         image = DWPGradientImage(idx);
     }
-    BOOL ok = [DWPEngine applyImage:image target:target];
+    BOOL ok = gDWPTestExperimental ? [DWPEngine applyImageExperimental:image target:target]
+                                       : [DWPEngine applyImage:image target:target];
     DWPSetPref(DWPKeyCurrentColor, @(idx));
     DWPMarkApplied(idx);
     DWPLog(@"apply (%@): %@ vi tri %ld target %ld -> anh %@ / mau native %@",
@@ -152,7 +155,7 @@ static void DWPCheckAndApply(NSString *reason, BOOL force) {
         if (force) DWPLog(@"check (%@): tweak dang TAT, bo qua", reason);
         return;
     }
-    // Cong ban quyen (1.0.8): het dung thu / het han key thi khong doi nen.
+    // Cong ban quyen (1.0.10): het dung thu / het han key thi khong doi nen.
     // Log chi khi trang thai thay doi de khoi spam moi 60 giay.
     if (!DWPLicenseActive()) {
         static DWPLicState lastLicState = (DWPLicState)-1;
@@ -286,7 +289,7 @@ static void DWPHandleTestEngine(void) {
     [DWPEngine dumpDiagnostics];
     UIImage *img = DWPTestImage();
     NSInteger target = DWPPrefInt(DWPKeyTarget, 2);
-    BOOL ok = [DWPEngine applyImage:img target:target];
+    BOOL ok = [DWPEngine applyImageExperimental:img target:target];
     DWPLog(@"test engine: target %ld -> %@", (long)target, ok ? @"CO duong nhan lenh" : @"KHONG duong nao nhan lenh");
 }
 
@@ -296,7 +299,9 @@ static void DWPHandleTestColor(void) {
         DWPLog(@"test mau: BAN QUYEN khong con han (%@) — bo qua", DWPLicenseStatusText());
         return;
     }
+    gDWPTestExperimental = YES;
     DWPApplyColorLike(-1, @"testColor", YES);
+    gDWPTestExperimental = NO;
 }
 
 static void DWPOnPrefsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
@@ -320,7 +325,7 @@ static UIImage *DWPTestImage(void) {
         UIRectFill(CGRectMake(0, 0, size.width, size.height));
         NSDictionary *attrs = @{ NSFontAttributeName: [UIFont boldSystemFontOfSize:130],
                                  NSForegroundColorAttributeName: [UIColor whiteColor] };
-        NSString *text = @"DWP TEST\n1.0.8";
+        NSString *text = @"DWP TEST\n1.0.10";
         CGSize ts = [text sizeWithAttributes:attrs];
         [text drawInRect:CGRectMake((size.width - ts.width) / 2.0, (size.height - ts.height) / 2.0, ts.width, ts.height) withAttributes:attrs];
     }];

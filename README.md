@@ -1,4 +1,4 @@
-# DailyWallpaper Pro 1.0.8
+# DailyWallpaper Pro 1.0.10
 
 Tweak `com.anhdang.dailywallpaperpro` cho iPhone 12 Pro / iOS 16.3.1 / Dopamine rootless
 (build đủ 3 scheme: rootless, rootful, roothide).
@@ -28,16 +28,16 @@ Tweak `com.anhdang.dailywallpaperpro` cho iPhone 12 Pro / iOS 16.3.1 / Dopamine 
 - **Xem nhật ký ngay trong Cài đặt** (mở / chia sẻ / xoá log), mục Trạng thái (nguồn +
   nơi đổi, số ảnh, lần đổi gần nhất), đặt lại mốc đổi, đặt lại toàn bộ cài đặt.
 
-## Bản quyền (từ 1.0.8, theo đúng mẫu Fake5G/ZUS)
+## Bản quyền (từ 1.0.10, theo đúng mẫu Fake5G/ZUS)
 
 - **Dùng thử 3 ngày** tự động từ lần chạy đầu. Mốc ghi 3 nơi (prefs + Keychain + file ẩn trong Documents), lấy mốc sớm nhất, chống vặn ngược đồng hồ — gỡ/cài lại tweak không reset được dùng thử.
 - **Key chính** (kind 1): vĩnh viễn, không buộc máy — key riêng của anh.
 - **Key phụ** (kind 3): 3 ngày tính từ lần kích hoạt đầu tiên, **buộc đúng 1 mã máy** — khách đọc "Mã máy" ở mục Bản quyền trong Cài đặt và gửi cho anh, anh cấp key riêng cho mã máy đó; dán sang máy khác bị từ chối ("key được cấp cho máy khác"). Mốc kích hoạt gắn với dấu vân của key và ghi 3 nơi: xoá key rồi nhập lại cùng key thì hạn vẫn tính từ lần đầu, không kéo dài được.
-- **Key phụ dùng chung** (kind 4, anh chọn thêm ở 1.0.8 — kiểu Fake5G): 15 key KHACH 01–15 đã sinh sẵn trong file key, 3 ngày từ lần kích hoạt đầu tiên trên từng máy, **không buộc máy** (máy nào dán cũng được; trên cùng 1 máy thì cài lại/nhập lại không kéo dài hạn).
+- **Key phụ dùng chung** (kind 4, anh chọn thêm ở 1.0.10 — kiểu Fake5G): 15 key KHACH 01–15 đã sinh sẵn trong file key, 3 ngày từ lần kích hoạt đầu tiên trên từng máy, **không buộc máy** (máy nào dán cũng được; trên cùng 1 máy thì cài lại/nhập lại không kéo dài hạn).
 - Trong lúc dùng thử, tweak vẫn đổi nền theo cấu hình sẵn có nhưng **trang Cài đặt bị phủ mờ** tới khi nhập key (đúng mẫu Fake5G anh đã chốt). Hết hạn: tweak ngừng đổi nền, trang Cài đặt khoá.
 - Bộ key RIÊNG của DailyWallpaperPro (tiền tố `DWP1-`, ECDSA P-256, chữ ký DER) nằm ở thư mục `DailyWallpaperPro-license/` ngoài cây nguồn — **tuyệt đối không đẩy thư mục đó lên GitHub**. Cấp key phụ: `python3 dwp_keygen.py sub <MÃ-MÁY> [tên khách]`.
 
-## Trạng thái bản 1.0.8 — CẦN TEST MÁY THẬT
+## Trạng thái bản 1.0.10 — CẦN TEST MÁY THẬT
 
 Bằng chứng từ log máy thật của bản 1.0.1 (27/11/2026):
 
@@ -45,10 +45,10 @@ Bằng chứng từ log máy thật của bản 1.0.1 (27/11/2026):
   (`SBWallpaperController` không còn method `setWallpaperWithImage` nào).
 - Dump thật cho thấy đường của iOS 16: `wallpaperConfigurationManager` +
   `SBFWallpaperConfiguration.wallpaperImage` + `updateWallpaperForLocations:withCompletion:`.
-  Bản 1.0.8 đi đường này trước (E1), dump nay in **toàn bộ** method/property/ivar
+  Bản 1.0.10 đi đường này trước (E1), dump nay in **toàn bộ** method/property/ivar
   không lọc để vòng sau có đủ bằng chứng.
 - Vụ "không chọn được hình" ở 1.0.1: log không có bất kỳ dòng lưu ảnh nào và code cũ
-  có nhánh thất bại im lặng. Bản 1.0.8 ghi log **mọi bước** của picker (mở trang, trình
+  có nhánh thất bại im lặng. Bản 1.0.10 ghi log **mọi bước** của picker (mở trang, trình
   picker, số kết quả, tải từng ảnh, lưu từng ô), báo lỗi bằng hộp thoại, trình picker
   trễ sau action sheet, và có đường tải dữ liệu thô dự phòng.
 

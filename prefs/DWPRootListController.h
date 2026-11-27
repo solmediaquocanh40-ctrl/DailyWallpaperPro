@@ -1,4 +1,4 @@
-// DWPRootListController.h — DailyWallpaperPro 1.0.8
+// DWPRootListController.h — DailyWallpaperPro 1.0.10
 
 #import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>

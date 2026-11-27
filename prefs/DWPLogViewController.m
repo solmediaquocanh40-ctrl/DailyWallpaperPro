@@ -1,4 +1,4 @@
-// DWPLogViewController.m — DailyWallpaperPro 1.0.8
+// DWPLogViewController.m — DailyWallpaperPro 1.0.10
 
 #import "DWPLogViewController.h"
 #import "../DWPShared.h"

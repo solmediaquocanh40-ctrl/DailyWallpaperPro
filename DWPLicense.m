@@ -1,4 +1,4 @@
-// DWPLicense.m — DailyWallpaperPro 1.0.8
+// DWPLicense.m — DailyWallpaperPro 1.0.10
 // Mang nguyen mau FG5License cua Fake5G 1.1.13 (da chay that tren may
 // anh) sang, doi tien to DWP + them BUOC MA MAY cho key phu theo yeu cau
 // cua anh: key phu chi kich hoat duoc tren dung 1 may co ma may khop.

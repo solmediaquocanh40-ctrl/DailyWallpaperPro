@@ -139,14 +139,12 @@
 			</array>
 		</dict>
 		<dict>
+			<key>action</key>
+			<string>openPhotos:</string>
 			<key>cell</key>
-			<string>PSLinkCell</string>
-			<key>detail</key>
-			<string>DWPPhotosController</string>
+			<string>PSButtonCell</string>
 			<key>id</key>
 			<string>photos</string>
-			<key>isController</key>
-			<true/>
 			<key>label</key>
 			<string>Manage photo list</string>
 		</dict>
@@ -738,7 +736,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>DailyWallpaper Pro 1.0.8 — com.anhdang.dailywallpaperpro — Log: /var/mobile/Documents/DailyWallpaperPro.log</string>
+			<string>DailyWallpaper Pro 1.0.10 — com.anhdang.dailywallpaperpro — Log: /var/mobile/Documents/DailyWallpaperPro.log</string>
 			<key>label</key>
 			<string>Settings &amp; log</string>
 		</dict>
@@ -763,14 +761,12 @@
 			<string>Import settings file</string>
 		</dict>
 		<dict>
+			<key>action</key>
+			<string>viewLog:</string>
 			<key>cell</key>
-			<string>PSLinkCell</string>
-			<key>detail</key>
-			<string>DWPLogViewController</string>
+			<string>PSButtonCell</string>
 			<key>id</key>
 			<string>logView</string>
-			<key>isController</key>
-			<true/>
 			<key>label</key>
 			<string>View log</string>
 		</dict>

@@ -1,4 +1,4 @@
-// DWPLicense.h — DailyWallpaperPro 1.0.8
+// DWPLicense.h — DailyWallpaperPro 1.0.10
 // He ban quyen theo dung mau Fake5G/ZUS da chay that tren may anh:
 //  - Dung thu 3 ngay tu dong tu lan chay dau; moc ghi 3 noi (prefs +
 //    Keychain + file trong Documents), lay moc som nhat, chong van
