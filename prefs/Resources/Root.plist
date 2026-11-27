@@ -8,6 +8,56 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
+			<string>…</string>
+			<key>id</key>
+			<string>licenseGroup</string>
+			<key>label</key>
+			<string>Bản quyền</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSTitleValueCell</string>
+			<key>id</key>
+			<string>licStatus</string>
+			<key>key</key>
+			<string>licStatus</string>
+			<key>label</key>
+			<string>Trạng thái</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSTitleValueCell</string>
+			<key>id</key>
+			<string>licMachine</string>
+			<key>key</key>
+			<string>licMachine</string>
+			<key>label</key>
+			<string>Mã máy của máy này</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>copyMachine:</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>id</key>
+			<string>copyMachine</string>
+			<key>label</key>
+			<string>Sao chép mã máy</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>activateTapped:</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>id</key>
+			<string>activate</string>
+			<key>label</key>
+			<string>Nhập key kích hoạt</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
 			<string>Tự đổi hình nền theo lịch tháng hoặc theo khoảng thời gian anh tự đặt. Quản lý danh sách ảnh ngay trong trang này.</string>
 			<key>label</key>
 			<string>DailyWallpaper Pro</string>
@@ -688,7 +738,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>DailyWallpaper Pro 1.0.4 — com.anhdang.dailywallpaperpro — Log: /var/mobile/Documents/DailyWallpaperPro.log</string>
+			<string>DailyWallpaper Pro 1.0.5 — com.anhdang.dailywallpaperpro — Log: /var/mobile/Documents/DailyWallpaperPro.log</string>
 			<key>label</key>
 			<string>Cài đặt &amp; nhật ký</string>
 		</dict>

@@ -1,4 +1,4 @@
-// Tweak.x — DailyWallpaperPro 1.0.4 (com.anhdang.dailywallpaperpro)
+// Tweak.x — DailyWallpaperPro 1.0.5 (com.anhdang.dailywallpaperpro)
 // Chay trong SpringBoard: dong ho kiem tra moi 60 giay + thong bao Darwin
 // tu trang Cai dat (doi ngay / test engine / test mau). Khong hook class nao —
 // toan bo viec doi nen nam o DWPEngine (do API luc chay, ghi log tung duong).
@@ -9,6 +9,7 @@
 #import <CoreImage/CoreImage.h>
 #import "DWPShared.h"
 #import "DWPEngine.h"
+#import "DWPLicense.h"
 
 // Khai bao truoc moi ham/bien toan cuc ma khoi duoi dung (thu tu khai bao).
 static void DWPCheckAndApply(NSString *reason, BOOL force);
@@ -151,6 +152,17 @@ static void DWPCheckAndApply(NSString *reason, BOOL force) {
         if (force) DWPLog(@"check (%@): tweak dang TAT, bo qua", reason);
         return;
     }
+    // Cong ban quyen (1.0.5): het dung thu / het han key thi khong doi nen.
+    // Log chi khi trang thai thay doi de khoi spam moi 60 giay.
+    if (!DWPLicenseActive()) {
+        static DWPLicState lastLicState = (DWPLicState)-1;
+        DWPLicState st = DWPLicenseCurrentState(NULL, NULL);
+        if (st != lastLicState) {
+            lastLicState = st;
+            DWPLog(@"check (%@): BAN QUYEN khong con han (%@) — khong doi nen", reason, DWPLicenseStatusText());
+        }
+        return;
+    }
     if (!force && DWPBatteryBlocksChange()) return;
 
     NSInteger source = DWPPrefInt(DWPKeySourceMode, 0);
@@ -267,6 +279,10 @@ static void DWPHandleApplyNow(void) {
 
 static void DWPHandleTestEngine(void) {
     DWPLog(@"notify: anh bam TEST ENGINE trong Cai dat");
+    if (!DWPLicenseActive()) {
+        DWPLog(@"test engine: BAN QUYEN khong con han (%@) — bo qua", DWPLicenseStatusText());
+        return;
+    }
     [DWPEngine dumpDiagnostics];
     UIImage *img = DWPTestImage();
     NSInteger target = DWPPrefInt(DWPKeyTarget, 2);
@@ -276,6 +292,10 @@ static void DWPHandleTestEngine(void) {
 
 static void DWPHandleTestColor(void) {
     DWPLog(@"notify: anh bam TEST MAU trong Cai dat");
+    if (!DWPLicenseActive()) {
+        DWPLog(@"test mau: BAN QUYEN khong con han (%@) — bo qua", DWPLicenseStatusText());
+        return;
+    }
     DWPApplyColorLike(-1, @"testColor", YES);
 }
 
@@ -300,7 +320,7 @@ static UIImage *DWPTestImage(void) {
         UIRectFill(CGRectMake(0, 0, size.width, size.height));
         NSDictionary *attrs = @{ NSFontAttributeName: [UIFont boldSystemFontOfSize:130],
                                  NSForegroundColorAttributeName: [UIColor whiteColor] };
-        NSString *text = @"DWP TEST\n1.0.4";
+        NSString *text = @"DWP TEST\n1.0.5";
         CGSize ts = [text sizeWithAttributes:attrs];
         [text drawInRect:CGRectMake((size.width - ts.width) / 2.0, (size.height - ts.height) / 2.0, ts.width, ts.height) withAttributes:attrs];
     }];

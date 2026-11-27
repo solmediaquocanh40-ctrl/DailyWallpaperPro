@@ -5,8 +5,8 @@ INSTALL_TARGET_PROCESSES := SpringBoard
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME := DailyWallpaperPro
-DailyWallpaperPro_FILES := Tweak.x DWPEngine.m DWPShared.m
-DailyWallpaperPro_FRAMEWORKS := UIKit Foundation CoreFoundation CoreImage
+DailyWallpaperPro_FILES := Tweak.x DWPEngine.m DWPShared.m DWPLicense.m
+DailyWallpaperPro_FRAMEWORKS := UIKit Foundation CoreFoundation CoreImage Security IOKit
 DailyWallpaperPro_CFLAGS := -fobjc-arc
 
 SUBPROJECTS += prefs

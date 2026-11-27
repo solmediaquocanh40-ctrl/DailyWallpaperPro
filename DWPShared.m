@@ -1,4 +1,4 @@
-// DWPShared.m — DailyWallpaperPro 1.0.4
+// DWPShared.m — DailyWallpaperPro 1.0.5
 
 #import "DWPShared.h"
 #import <CoreFoundation/CoreFoundation.h>

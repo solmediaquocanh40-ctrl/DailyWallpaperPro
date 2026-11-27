@@ -1,4 +1,4 @@
-// DWPRootListController.m — DailyWallpaperPro 1.0.4
+// DWPRootListController.m — DailyWallpaperPro 1.0.5
 // Ban nay QUAY VE specifiers bang PLIST (duong da chung minh chay tot o
 // 1.0.1: doi gia tri, bam nut deu ngon). Ban 1.0.2/1.0.3 dung specifiers
 // bang code — log 1.0.3 cho thay trang dung duoc nhung khong co bat ky
@@ -8,6 +8,7 @@
 
 #import "DWPRootListController.h"
 #import "../DWPShared.h"
+#import "../DWPLicense.h"
 #import "DWPPhotosController.h"
 #import "DWPLogViewController.h"
 #import "DWPPickerHelper.h"
@@ -26,6 +27,11 @@
     if (!_specifiers) {
         NSString *plistName = (DWPLanguage() == 1) ? @"RootEN" : @"Root";
         _specifiers = [self loadSpecifiersFromPlistName:plistName target:self];
+        for (PSSpecifier *spec in _specifiers) {
+            if ([[spec propertyForKey:@"id"] isEqualToString:@"licenseGroup"]) {
+                [spec setProperty:DWPLicenseStatusText() forKey:@"footerText"];
+            }
+        }
         DWPLog(@"prefs: da nap specifiers tu %@.plist (%lu muc)", plistName, (unsigned long)_specifiers.count);
     }
     return _specifiers;
@@ -33,6 +39,8 @@
 
 - (id)readPreferenceValue:(PSSpecifier *)specifier {
     NSString *key = [specifier propertyForKey:@"key"];
+    if ([key isEqualToString:@"licStatus"]) return DWPLicenseStatusText();
+    if ([key isEqualToString:@"licMachine"]) return DWPLicenseMachineCode();
     if ([key isEqualToString:@"infoSource"]) {
         NSInteger source = DWPPrefInt(DWPKeySourceMode, 0);
         NSInteger target = DWPPrefInt(DWPKeyTarget, 2);
@@ -103,6 +111,141 @@
     DWPPostDarwin(DWP_NOTIFY_PREFS);
     [self showAlertTitle:DWPT(@"Đã đặt lại mốc đổi", @"Timer reset")
                  message:DWPT(@"Lần kiểm tra tiếp theo (tối đa 60 giây) tweak sẽ đổi nền lại từ đầu.", @"Within 60 seconds the tweak will apply again from the start.")];
+}
+
+#pragma mark - Ban quyen: phu mo + popup Active (mau Fake5G/ZUS)
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if (DWPLicenseHasActiveKey()) {
+        [self removeExpiredOverlay];
+        self.popupShownThisAppear = NO;
+    } else {
+        [self installExpiredOverlay];
+        if (!self.popupShownThisAppear) {
+            self.popupShownThisAppear = YES;
+            [self showActivatePopup];
+        }
+    }
+}
+
+- (void)installExpiredOverlay {
+    if ([self.view viewWithTag:9001]) return;
+    UIVisualEffectView *blur = [[UIVisualEffectView alloc]
+        initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial]];
+    blur.tag = 9001;
+    blur.frame = self.view.bounds;
+    blur.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    UILabel *label = [[UILabel alloc] initWithFrame:blur.contentView.bounds];
+    label.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    label.text = (DWPLicenseCurrentState(NULL, NULL) == DWPLicStateTrial)
+        ? DWPT(@"Đang dùng thử — nhập key để mở khoá điều chỉnh\nChạm để nhập key kích hoạt",
+               @"Trial running — enter a key to unlock settings\nTap to enter your activation key")
+        : DWPT(@"Đã hết hạn dùng thử\nChạm để nhập key kích hoạt",
+               @"Trial expired\nTap to enter your activation key");
+    label.numberOfLines = 2;
+    label.textAlignment = NSTextAlignmentCenter;
+    label.font = [UIFont systemFontOfSize:15 weight:UIFontWeightSemibold];
+    [blur.contentView addSubview:label];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
+        initWithTarget:self action:@selector(expiredOverlayTapped)];
+    [blur addGestureRecognizer:tap];
+    [self.view addSubview:blur];
+}
+
+- (void)removeExpiredOverlay {
+    [[self.view viewWithTag:9001] removeFromSuperview];
+}
+
+- (void)expiredOverlayTapped {
+    [self showActivatePopup];
+}
+
+- (void)activateTapped:(id)sender {
+    [self showActivatePopup];
+}
+
+- (void)copyMachine:(id)sender {
+    [UIPasteboard generalPasteboard].string = DWPLicenseMachineCode();
+    DWPLog(@"prefs: anh vua sao chep ma may %@", DWPLicenseMachineCode());
+    [self showAlertTitle:DWPT(@"Đã chép mã máy", @"Machine code copied")
+                 message:DWPLicenseMachineCode()];
+}
+
+- (void)showActivatePopup {
+    [self showActivatePopupWithMessage:DWPLicenseStatusText()];
+}
+
+- (void)showActivatePopupWithMessage:(NSString *)message {
+    if (self.activeAlert) return;
+    UIAlertController *alert = [UIAlertController
+        alertControllerWithTitle:DWPT(@"Kích hoạt DailyWallpaper Pro", @"Activate DailyWallpaper Pro")
+                         message:[message stringByAppendingFormat:@"\n%@",
+                                  DWPT(@"Dán key vào ô dưới rồi bấm OK. Popup tự đóng sau 30 giây.",
+                                       @"Paste your key below and tap OK. This popup closes itself after 30 seconds.")]
+                  preferredStyle:UIAlertControllerStyleAlert];
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"DWP1-....";
+        textField.autocapitalizationType = UITextAutocapitalizationTypeAllCharacters;
+        textField.autocorrectionType = UITextAutocorrectionTypeNo;
+        textField.delegate = self;
+    }];
+    __weak typeof(self) weakSelf = self;
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+        handler:^(UIAlertAction *action) {
+            [weakSelf stopPopupTimer];
+            weakSelf.activeAlert = nil;
+            NSString *key = alert.textFields.firstObject.text ?: @"";
+            NSString *name = nil, *error = nil;
+            if (DWPLicenseTryActivateKey(key, &name, &error)) {
+                [weakSelf removeExpiredOverlay];
+                weakSelf.popupShownThisAppear = NO;
+                _specifiers = nil;
+                [weakSelf reloadSpecifiers];
+                [weakSelf showAlertTitle:DWPT(@"Đã kích hoạt", @"Activated")
+                                 message:[NSString stringWithFormat:DWPT(@"Key của %@ đã được chấp nhận.", @"The key for %@ was accepted."), name ?: @""]];
+            } else {
+                [weakSelf showActivatePopupWithMessage:(error ?: DWPT(@"Key chưa đúng.", @"Invalid key."))];
+            }
+        }]];
+    [alert addAction:[UIAlertAction actionWithTitle:DWPT(@"Huỷ", @"Cancel") style:UIAlertActionStyleCancel
+        handler:^(UIAlertAction *action) {
+            [weakSelf stopPopupTimer];
+            weakSelf.activeAlert = nil;
+        }]];
+    self.activeAlert = alert;
+    self.popupSecondsLeft = 30;
+    self.popupEditing = NO;
+    [self presentViewController:alert animated:YES completion:nil];
+    [self stopPopupTimer];
+    self.popupTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                       target:self
+                                                     selector:@selector(popupTimerFired)
+                                                     userInfo:nil
+                                                      repeats:YES];
+}
+
+- (void)popupTimerFired {
+    if (self.popupEditing) return;
+    self.popupSecondsLeft -= 1;
+    if (self.popupSecondsLeft <= 0) {
+        [self stopPopupTimer];
+        [self.activeAlert dismissViewControllerAnimated:YES completion:nil];
+        self.activeAlert = nil;
+    }
+}
+
+- (void)stopPopupTimer {
+    [self.popupTimer invalidate];
+    self.popupTimer = nil;
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+    self.popupEditing = YES;
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    self.popupEditing = NO;
 }
 
 #pragma mark - Chon anh du phong ngay o trang chinh
@@ -197,7 +340,7 @@
 
 - (void)resetAll:(id)sender {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:DWPT(@"Đặt lại toàn bộ cài đặt?", @"Reset all settings?")
-        message:DWPT(@"Mọi lựa chọn sẽ về mặc định. Ảnh đã lưu KHÔNG bị xoá.", @"All options return to defaults. Saved photos are NOT deleted.")
+        message:DWPT(@"Mọi lựa chọn sẽ về mặc định, key đã kích hoạt bị xoá (phải nhập lại; hạn key vẫn tính từ lần kích hoạt đầu tiên, dùng thử không chạy lại). Ảnh đã lưu KHÔNG bị xoá.", @"All options return to defaults and the activated key is removed (re-enter it; its expiry still counts from first activation and the trial does not restart). Saved photos are NOT deleted.")
         preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:DWPT(@"Huỷ", @"Cancel") style:UIAlertActionStyleCancel handler:nil]];
     [alert addAction:[UIAlertAction actionWithTitle:DWPT(@"Đặt lại", @"Reset") style:UIAlertActionStyleDestructive handler:^(UIAlertAction *a) {
@@ -206,10 +349,17 @@
         DWPRemovePref(DWPKeyLastDay);
         DWPRemovePref(DWPKeyCurrentSlot);
         DWPRemovePref(DWPKeyCurrentColor);
+        // Xoa key da kich hoat nhung GIU NGUYEN cac moc thoi gian ban quyen
+        // (trialStart/maxSeen/actStart/actKeyHash o 3 noi) — mau Fake5G.
+        DWPRemovePref(@"licenseKey");
         DWPPostDarwin(DWP_NOTIFY_PREFS);
-        DWPLog(@"prefs: anh vua DAT LAI TOAN BO cai dat");
+        DWPLog(@"prefs: anh vua DAT LAI TOAN BO cai dat (da xoa key, giu moc ban quyen)");
         _specifiers = nil;
         [self reloadSpecifiers];
+        if (!DWPLicenseHasActiveKey()) {
+            [self installExpiredOverlay];
+            self.popupShownThisAppear = YES;
+        }
     }]];
     [self presentViewController:alert animated:YES completion:nil];
 }
