@@ -1,4 +1,4 @@
-// DWPPhotosController.m — DailyWallpaperPro 1.0.0
+// DWPPhotosController.m — DailyWallpaperPro 1.0.1
 
 #import "DWPPhotosController.h"
 #import "../DWPShared.h"

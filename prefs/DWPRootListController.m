@@ -1,4 +1,4 @@
-// DWPRootListController.m — DailyWallpaperPro 1.0.0
+// DWPRootListController.m — DailyWallpaperPro 1.0.1
 
 #import "DWPRootListController.h"
 #import "../DWPShared.h"

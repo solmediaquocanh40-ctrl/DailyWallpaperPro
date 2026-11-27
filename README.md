@@ -1,4 +1,4 @@
-# DailyWallpaper Pro 1.0.0
+# DailyWallpaper Pro 1.0.1
 
 Tweak `com.anhdang.dailywallpaperpro` cho iPhone 12 Pro / iOS 16.3.1 / Dopamine rootless
 (build du 3 scheme: rootless, rootful, roothide).
@@ -17,7 +17,7 @@ Tweak `com.anhdang.dailywallpaperpro` cho iPhone 12 Pro / iOS 16.3.1 / Dopamine 
   Anh duoc copy va thu ve 1170x2532 vao `/var/mobile/Library/DailyWallpaperPro/`,
   khong tro thang vao Thu vien Anh.
 
-## Trang thai ban 1.0.0 — CAN TEST MAY THAT
+## Trang thai ban 1.0.1 — CAN TEST MAY THAT
 
 - Phan logic (lich thang, khoang thoi gian, quan ly o anh) da kiem tinh day du.
 - **Engine doi nen tren iOS 16 CHUA co bang chung tren may that.** iOS 16 doi sang he

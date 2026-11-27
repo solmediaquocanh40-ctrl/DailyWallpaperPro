@@ -1,4 +1,4 @@
-// DWPShared.m — DailyWallpaperPro 1.0.0
+// DWPShared.m — DailyWallpaperPro 1.0.1
 
 #import "DWPShared.h"
 #import <CoreFoundation/CoreFoundation.h>
@@ -46,7 +46,7 @@ static NSUserDefaults *DWPSuite(void) {
     return [[NSUserDefaults alloc] initWithSuiteName:DWP_BUNDLE_ID];
 }
 
-id DWPPrefObject(NSString *key) {
+id _Nullable DWPPrefObject(NSString *key) {
     return [DWPSuite() objectForKey:key];
 }
 

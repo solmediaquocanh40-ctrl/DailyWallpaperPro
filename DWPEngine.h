@@ -1,4 +1,4 @@
-// DWPEngine.h — DailyWallpaperPro 1.0.0
+// DWPEngine.h — DailyWallpaperPro 1.0.1
 // Engine doi hinh nen tren iOS 16: do API he thong luc chay, thu lan luot
 // cac duong da biet, ghi log tung buoc. Chua co bang chung tren may that —
 // log DailyWallpaperPro.log la nguon de chot duong dung o ban sau.

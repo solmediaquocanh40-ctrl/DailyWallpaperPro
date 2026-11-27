@@ -1,4 +1,4 @@
-// Tweak.x — DailyWallpaperPro 1.0.0 (com.anhdang.dailywallpaperpro)
+// Tweak.x — DailyWallpaperPro 1.0.1 (com.anhdang.dailywallpaperpro)
 // Chay trong SpringBoard: dong ho kiem tra moi 60 giay + thong bao Darwin
 // tu trang Cai dat (doi ngay / test engine). Khong hook class nao o ban nay —
 // toan bo viec doi nen nam o DWPEngine (do API luc chay, ghi log tung duong).
@@ -147,7 +147,7 @@ static UIImage *DWPTestImage(void) {
         UIRectFill(CGRectMake(0, 0, size.width, size.height));
         NSDictionary *attrs = @{ NSFontAttributeName: [UIFont boldSystemFontOfSize:130],
                                  NSForegroundColorAttributeName: [UIColor whiteColor] };
-        NSString *text = @"DWP TEST\n1.0.0";
+        NSString *text = @"DWP TEST\n1.0.1";
         CGSize ts = [text sizeWithAttributes:attrs];
         [text drawInRect:CGRectMake((size.width - ts.width) / 2.0, (size.height - ts.height) / 2.0, ts.width, ts.height) withAttributes:attrs];
     }];

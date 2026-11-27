@@ -1,4 +1,4 @@
-// DWPShared.h — DailyWallpaperPro 1.0.0
+// DWPShared.h — DailyWallpaperPro 1.0.1
 // Hang so + ham dung chung giua tweak (SpringBoard) va trang Cai dat.
 
 #import <Foundation/Foundation.h>
@@ -6,7 +6,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define DWP_VERSION @"1.0.0"
+#define DWP_VERSION @"1.0.1"
 #define DWP_BUNDLE_ID @"com.anhdang.dailywallpaperpro"
 #define DWP_LOG_PATH @"/var/mobile/Documents/DailyWallpaperPro.log"
 #define DWP_PHOTOS_DIR @"/var/mobile/Library/DailyWallpaperPro"
@@ -31,7 +31,7 @@ extern NSString * const DWPKeyCurrentSlot;    // o anh dang hien (1-31)
 
 void DWPLog(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
-nullable id DWPPrefObject(NSString *key);
+id _Nullable DWPPrefObject(NSString *key);
 BOOL DWPPrefBool(NSString *key, BOOL fallback);
 NSInteger DWPPrefInt(NSString *key, NSInteger fallback);
 double DWPPrefDouble(NSString *key, double fallback);
