@@ -1,4 +1,4 @@
-// DWPLicense.m — DailyWallpaperPro 1.0.5
+// DWPLicense.m — DailyWallpaperPro 1.0.7
 // Mang nguyen mau FG5License cua Fake5G 1.1.13 (da chay that tren may
 // anh) sang, doi tien to DWP + them BUOC MA MAY cho key phu theo yeu cau
 // cua anh: key phu chi kich hoat duoc tren dung 1 may co ma may khop.
@@ -23,16 +23,24 @@ static NSString *DWPRawDeviceID(void) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NSString *found = nil;
-        void *(*mgCopyAnswer)(const char *) = (void *(*)(const char *))dlsym(RTLD_DEFAULT, "MGCopyAnswer");
+        // MGCopyAnswer nhan CFStringRef (khai bao trong MobileGestalt.h cua
+        // Theos). Ban 1.0.5 khai bao prototype SAI kieu const char* va
+        // truyen UTF8String — ham doi con tro chuoi C thanh object nen
+        // vang ngay lan goi dau tien, dung luc trang Cai dat hien o Ma may
+        // (bang chung log 1.0.5: specifiers nap xong 46 muc nhung khong co
+        // dong hoan tat doc dinh danh, vang 2/2 lan mo trang).
+        DWPLog(@"ban quyen: doc dinh danh may — bat dau (MGCopyAnswer)");
+        CFTypeRef (*mgCopyAnswer)(CFStringRef) = (CFTypeRef (*)(CFStringRef))dlsym(RTLD_DEFAULT, "MGCopyAnswer");
         if (mgCopyAnswer) {
             for (NSString *q in @[@"UniqueDeviceID", @"SerialNumber"]) {
-                CFTypeRef v = mgCopyAnswer([q UTF8String]);
+                CFTypeRef v = mgCopyAnswer((__bridge CFStringRef)q);
                 if (v) {
                     id obj = CFBridgingRelease(v);
                     if ([obj isKindOfClass:[NSString class]] && [(NSString *)obj length] > 0) { found = obj; break; }
                 }
             }
         }
+        DWPLog(@"ban quyen: doc dinh danh may — MGCopyAnswer %@", found ? @"CO ket qua" : @"khong co, lui ve IOKit");
         if (!found) {
             io_service_t svc = IOServiceGetMatchingService(kIOMasterPortDefault,
                                                            IOServiceMatching("IOPlatformExpertDevice"));
@@ -230,7 +238,7 @@ static BOOL DWPVerifyKey(NSString *key, NSInteger *kindOut, NSString **nameOut, 
     const unsigned char *b = blob.bytes;
     if (memcmp(b, "DWPK", 4) != 0 || b[4] != 1) return NO;
     NSInteger kind = b[5];
-    if (kind != 1 && kind != 3) return NO;
+    if (kind != 1 && kind != 3 && kind != 4) return NO;
     NSUInteger nameLen = b[6];
     NSUInteger payloadLen = 7 + nameLen + (kind == 3 ? 8 : 0);
     if (blob.length <= payloadLen) return NO;
@@ -360,7 +368,7 @@ BOOL DWPLicenseTryActivateKey(NSString *key, NSString **nameOut, NSString **erro
     DWPLoadState(&start, &effNow, &act, &actHash, &dirty);
     id oldObj = DWPPrefObject(DWP_LIC_KEY);
     NSString *oldKey = [oldObj isKindOfClass:[NSString class]] ? oldObj : @"";
-    if (kind == 3) {
+    if (kind == 3 || kind == 4) {
         NSString *hash = DWPKeyHash(clean);
         if (act > 0 && [actHash isEqualToString:hash]) {
             // Cung key da tung kich hoat: GIU moc dau tien — xoa key roi

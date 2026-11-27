@@ -1,4 +1,4 @@
-// DWPPhotosController.m — DailyWallpaperPro 1.0.5
+// DWPPhotosController.m — DailyWallpaperPro 1.0.7
 // Ban nay sua vu "khong chon duoc hinh" cua 1.0.1: log MOI buoc cua picker,
 // khong con nhanh that bai im lang, trinh picker tre 0.4s sau action sheet
 // (tranh dung luc sheet dang tat), co nut Chon anh ngay trong trang va

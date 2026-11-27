@@ -1,4 +1,4 @@
-// DWPEngine.h — DailyWallpaperPro 1.0.5
+// DWPEngine.h — DailyWallpaperPro 1.0.7
 // Engine doi hinh nen tren iOS 16. Log may that cua ban 1.0.1 da chung minh:
 // SBWallpaperController KHONG con bat ky method setWallpaperWithImage nao —
 // 4 duong cu deu "selector khong ton tai". Duong moi cua ban nay dua tren

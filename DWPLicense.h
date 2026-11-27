@@ -1,4 +1,4 @@
-// DWPLicense.h — DailyWallpaperPro 1.0.5
+// DWPLicense.h — DailyWallpaperPro 1.0.7
 // He ban quyen theo dung mau Fake5G/ZUS da chay that tren may anh:
 //  - Dung thu 3 ngay tu dong tu lan chay dau; moc ghi 3 noi (prefs +
 //    Keychain + file trong Documents), lay moc som nhat, chong van
@@ -9,6 +9,9 @@
 //    dau van ma may cua dung 1 may — may khac dan vao bi tu choi. Moc
 //    kich hoat gan voi dau van cua key (SHA-256) va ghi 3 noi: xoa key
 //    roi nhap lai cung key thi han van tinh tu lan kich hoat dau tien.
+//    kind 4 = key phu DUNG CHUNG (anh chon them 1.0.6, kieu Fake5G): 3
+//    ngay tu luc kich hoat, khong buoc may — may nao dan cung duoc,
+//    nhung tren tung may han van tinh tu lan kich hoat dau cua key do.
 //  - Chu ky luu dang DER (dung hop dong cua SecKeyVerifySignature X962).
 #import <Foundation/Foundation.h>
 

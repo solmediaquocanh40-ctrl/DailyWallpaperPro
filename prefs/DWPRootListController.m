@@ -1,4 +1,4 @@
-// DWPRootListController.m — DailyWallpaperPro 1.0.5
+// DWPRootListController.m — DailyWallpaperPro 1.0.7
 // Ban nay QUAY VE specifiers bang PLIST (duong da chung minh chay tot o
 // 1.0.1: doi gia tri, bam nut deu ngon). Ban 1.0.2/1.0.3 dung specifiers
 // bang code — log 1.0.3 cho thay trang dung duoc nhung khong co bat ky
