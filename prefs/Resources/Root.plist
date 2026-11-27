@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Tu doi hinh nen theo lich thang hoac theo khoang thoi gian anh tu set. Anh quan ly danh sach anh ngay trong trang nay.</string>
+			<key>label</key>
+			<string>DailyWallpaper Pro</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>id</key>
+			<string>enabled</string>
+			<key>key</key>
+			<string>enabled</string>
+			<key>label</key>
+			<string>Bat DailyWallpaper Pro</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Both = doi ca man hinh khoa va man hinh chinh cung 1 anh.</string>
+			<key>label</key>
+			<string>Noi doi hinh nen</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>2</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>target</string>
+			<key>key</key>
+			<string>target</string>
+			<key>label</key>
+			<string>Doi o dau</string>
+			<key>validTitles</key>
+			<array>
+				<string>Chi man hinh khoa</string>
+				<string>Chi man hinh chinh</string>
+				<string>Ca hai (Both)</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Danh sach anh</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>detail</key>
+			<string>DWPPhotosController</string>
+			<key>id</key>
+			<string>photos</string>
+			<key>isController</key>
+			<true/>
+			<key>label</key>
+			<string>Quan ly danh sach anh</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Theo lich thang: ngay may hien anh o ay, thang co bao nhieu ngay thi chon bay nhieu anh. Theo khoang thoi gian: cu het khoang la doi anh tiep theo. Tat: chi dung 1 anh co dinh.</string>
+			<key>label</key>
+			<string>Kieu tu doi</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>rotationMode</string>
+			<key>key</key>
+			<string>rotationMode</string>
+			<key>label</key>
+			<string>Kieu tu doi</string>
+			<key>validTitles</key>
+			<array>
+				<string>Theo lich thang</string>
+				<string>Theo khoang thoi gian tu set</string>
+				<string>Tat - chi dung 1 anh</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>orderMode</string>
+			<key>key</key>
+			<string>orderMode</string>
+			<key>label</key>
+			<string>Thu tu (che do khoang thoi gian)</string>
+			<key>validTitles</key>
+			<array>
+				<string>Lan luot 1, 2, 3...</string>
+				<string>Ngau nhien</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Qua gio nay moi ngay, anh cua ngay hom do moi duoc ap.</string>
+			<key>label</key>
+			<string>Gio bat dau ngay (che do lich thang)</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>scheduleHour</string>
+			<key>key</key>
+			<string>scheduleHour</string>
+			<key>label</key>
+			<string>Gio bat dau</string>
+			<key>validTitles</key>
+			<array>
+				<string>0 gio</string>
+				<string>1 gio</string>
+				<string>2 gio</string>
+				<string>3 gio</string>
+				<string>4 gio</string>
+				<string>5 gio</string>
+				<string>6 gio</string>
+				<string>7 gio</string>
+				<string>8 gio</string>
+				<string>9 gio</string>
+				<string>10 gio</string>
+				<string>11 gio</string>
+				<string>12 gio</string>
+				<string>13 gio</string>
+				<string>14 gio</string>
+				<string>15 gio</string>
+				<string>16 gio</string>
+				<string>17 gio</string>
+				<string>18 gio</string>
+				<string>19 gio</string>
+				<string>20 gio</string>
+				<string>21 gio</string>
+				<string>22 gio</string>
+				<string>23 gio</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+				<integer>5</integer>
+				<integer>6</integer>
+				<integer>7</integer>
+				<integer>8</integer>
+				<integer>9</integer>
+				<integer>10</integer>
+				<integer>11</integer>
+				<integer>12</integer>
+				<integer>13</integer>
+				<integer>14</integer>
+				<integer>15</integer>
+				<integer>16</integer>
+				<integer>17</integer>
+				<integer>18</integer>
+				<integer>19</integer>
+				<integer>20</integer>
+				<integer>21</integer>
+				<integer>22</integer>
+				<integer>23</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>scheduleMinute</string>
+			<key>key</key>
+			<string>scheduleMinute</string>
+			<key>label</key>
+			<string>Phut bat dau</string>
+			<key>validTitles</key>
+			<array>
+				<string>00 phut</string>
+				<string>05 phut</string>
+				<string>10 phut</string>
+				<string>15 phut</string>
+				<string>20 phut</string>
+				<string>30 phut</string>
+				<string>40 phut</string>
+				<string>45 phut</string>
+				<string>50 phut</string>
+				<string>55 phut</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>5</integer>
+				<integer>10</integer>
+				<integer>15</integer>
+				<integer>20</integer>
+				<integer>30</integer>
+				<integer>40</integer>
+				<integer>45</integer>
+				<integer>50</integer>
+				<integer>55</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Vi du: 30 Phut = 30 phut doi 1 lan; 24 Gio hoac 48 Gio = 1 hoac 2 ngay doi 1 lan; 1 Thang = moi thang doi 1 lan.</string>
+			<key>label</key>
+			<string>Khoang thoi gian (che do khoang thoi gian)</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>1</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>intervalValue</string>
+			<key>key</key>
+			<string>intervalValue</string>
+			<key>label</key>
+			<string>Moi (so)</string>
+			<key>validTitles</key>
+			<array>
+				<string>1</string>
+				<string>2</string>
+				<string>3</string>
+				<string>5</string>
+				<string>10</string>
+				<string>15</string>
+				<string>30</string>
+				<string>45</string>
+				<string>48</string>
+				<string>60</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>5</integer>
+				<integer>10</integer>
+				<integer>15</integer>
+				<integer>30</integer>
+				<integer>45</integer>
+				<integer>48</integer>
+				<integer>60</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>2</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>intervalUnit</string>
+			<key>key</key>
+			<string>intervalUnit</string>
+			<key>label</key>
+			<string>Don vi</string>
+			<key>validTitles</key>
+			<array>
+				<string>Phut</string>
+				<string>Gio</string>
+				<string>Ngay</string>
+				<string>Thang</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Thao tac</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>applyNow:</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>id</key>
+			<string>applyNow</string>
+			<key>label</key>
+			<string>Doi anh ngay bay gio</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>testEngine:</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>id</key>
+			<string>testEngine</string>
+			<key>label</key>
+			<string>Test engine doi nen (anh do DWP TEST)</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>resetState:</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>id</key>
+			<string>resetState</string>
+			<key>label</key>
+			<string>Dat lai moc doi</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>DailyWallpaper Pro 1.0.0 - com.anhdang.dailywallpaperpro - Log: /var/mobile/Documents/DailyWallpaperPro.log</string>
+		</dict>
+	</array>
+	<key>title</key>
+	<string>DailyWallpaper Pro</string>
+</dict>
+</plist>

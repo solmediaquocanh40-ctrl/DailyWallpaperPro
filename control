@@ -1,0 +1,9 @@
+Package: com.anhdang.dailywallpaperpro
+Name: DailyWallpaper Pro
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Tu doi hinh nen theo lich thang (thang co bao nhieu ngay thi chon bay nhieu anh, ngay may hien anh ay) hoac theo khoang thoi gian tu set (phut/gio/ngay/thang, hoac tat de dung 1 anh). Doi rieng man hinh khoa, man hinh chinh hoac ca hai. Quan ly danh sach anh ngay trong Cai dat: chon nhieu anh cung luc, doi tung anh, hoan doi vi tri giua cac o.
+Maintainer: Anh Dang
+Author: Anh Dang
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
