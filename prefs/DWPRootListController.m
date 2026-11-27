@@ -1,4 +1,4 @@
-// DWPRootListController.m — DailyWallpaperPro 1.0.7
+// DWPRootListController.m — DailyWallpaperPro 1.0.8
 // Ban nay QUAY VE specifiers bang PLIST (duong da chung minh chay tot o
 // 1.0.1: doi gia tri, bam nut deu ngon). Ban 1.0.2/1.0.3 dung specifiers
 // bang code — log 1.0.3 cho thay trang dung duoc nhung khong co bat ky
@@ -14,6 +14,7 @@
 #import "DWPPickerHelper.h"
 #import <Preferences/PSSpecifier.h>
 #import <PhotosUI/PhotosUI.h>
+#import <Photos/Photos.h>
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 @interface DWPRootListController () <PHPickerViewControllerDelegate, UIDocumentPickerDelegate>
@@ -253,7 +254,7 @@
 - (void)pickPhotosFallback:(id)sender {
     DWPLog(@"prefs: anh bam CHON ANH DU PHONG o trang chinh");
     NSInteger limit = (DWPPrefInt(DWPKeyRotationMode, 0) == 0) ? DWPDaysInCurrentMonth() : 31;
-    PHPickerConfiguration *config = [[PHPickerConfiguration alloc] init];
+    PHPickerConfiguration *config = [[PHPickerConfiguration alloc] initWithPhotoLibrary:[PHPhotoLibrary sharedPhotoLibrary]];
     config.selectionLimit = limit;
     config.filter = [PHPickerFilter imagesFilter];
     PHPickerViewController *picker = [[PHPickerViewController alloc] initWithConfiguration:config];

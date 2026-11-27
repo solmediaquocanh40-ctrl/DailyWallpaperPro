@@ -1,4 +1,4 @@
-// DWPPhotosController.m — DailyWallpaperPro 1.0.7
+// DWPPhotosController.m — DailyWallpaperPro 1.0.8
 // Ban nay sua vu "khong chon duoc hinh" cua 1.0.1: log MOI buoc cua picker,
 // khong con nhanh that bai im lang, trinh picker tre 0.4s sau action sheet
 // (tranh dung luc sheet dang tat), co nut Chon anh ngay trong trang va
@@ -8,6 +8,7 @@
 #import "../DWPShared.h"
 #import "DWPPickerHelper.h"
 #import <PhotosUI/PhotosUI.h>
+#import <Photos/Photos.h>
 
 static UIImage *DWPThumbnailForSlot(NSInteger slot);
 
@@ -271,7 +272,7 @@ static UIImage *DWPThumbnailForSlot(NSInteger slot) {
 - (void)presentPickerWithLimit:(NSInteger)limit replaceSlot:(NSInteger)replaceSlot afterDelay:(BOOL)afterDelay {
     _replaceSlot = replaceSlot;
     void (^presentBlock)(void) = ^{
-        PHPickerConfiguration *config = [[PHPickerConfiguration alloc] init];
+        PHPickerConfiguration *config = [[PHPickerConfiguration alloc] initWithPhotoLibrary:[PHPhotoLibrary sharedPhotoLibrary]];
         config.selectionLimit = limit;
         config.filter = [PHPickerFilter imagesFilter];
         PHPickerViewController *picker = [[PHPickerViewController alloc] initWithConfiguration:config];

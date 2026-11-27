@@ -1,4 +1,4 @@
-// DWPEngine.m — DailyWallpaperPro 1.0.7
+// DWPEngine.m — DailyWallpaperPro 1.0.8
 
 #import "DWPEngine.h"
 #import "DWPShared.h"
@@ -15,6 +15,7 @@
 - (void)setWallpaperVariant:(NSInteger)variant withConfiguration:(id)configuration;
 - (id)wallpaperConfigurationManager;
 - (void)updateWallpaperForLocations:(NSInteger)locations withCompletion:(id)completion;
+- (void)_updateForLockScreenPosterConfiguration:(id)lockConfiguration homeScreenPosterConfiguration:(id)homeConfiguration;
 - (void)wallpaperServer:(id)server setWallpaperColor:(id)color darkColor:(id)darkColor forVariants:(id)variants completionHandler:(id)handler;
 @end
 
@@ -35,7 +36,11 @@
                                         @"SBFWallpaperOptions",
                                         @"SBWallpaperServer",
                                         @"PBWallpaperServer",
-                                        @"WFWallpaperServer"];
+                                        @"WFWallpaperServer",
+                                        @"PBUIWallpaperConfigurationManager",
+                                        @"PBUIWallpaperConfiguration",
+                                        @"PRSPosterConfiguration",
+                                        @"PRSPosterDescriptor"];
     for (NSString *name in classNames) {
         Class cls = objc_getClass([name UTF8String]);
         DWPLog(@"engine dump: class %@ = %@", name, cls ? @"CO" : @"KHONG CO");
@@ -90,6 +95,85 @@
         DWPLog(@"engine: duong %@ — NGOAI LE %@: %@", logName, e.name, e.reason);
         return NO;
     }
+}
+
+// Lay configuration cua 1 variant, thu lan luot cac muc types 3 -> 0 -> -1.
++ (id)fetchConfiguration:(id)manager variant:(NSInteger)variant {
+    SBFWallpaperConfigurationManager *mgr = (SBFWallpaperConfigurationManager *)manager;
+    for (NSNumber *t in @[@3, @0, @(-1)]) {
+        id cfg = nil;
+        @try {
+            cfg = [mgr wallpaperConfigurationForVariant:variant includingValuesForTypes:[t integerValue]];
+        } @catch (NSException *e) {
+            DWPLog(@"engine: lay config variant %ld types %ld NGOAI LE %@: %@", (long)variant, (long)[t integerValue], e.name, e.reason);
+            cfg = nil;
+        }
+        if (cfg) {
+            DWPLog(@"engine: lay duoc config variant %ld voi types %ld (class %@)", (long)variant, (long)[t integerValue], NSStringFromClass([cfg class]));
+            return cfg;
+        }
+    }
+    DWPLog(@"engine: variant %ld khong lay duoc configuration o moi types", (long)variant);
+    return nil;
+}
+
+// Doc lai wallpaperImage cua config SAU khi ap (tre 1.5 giay) de phan dinh:
+// anh moi con nam trong config khong, hay chi la ban sao tam thoi.
++ (void)readBackConfiguration:(id)manager variant:(NSInteger)variant appliedImage:(UIImage *)image tag:(NSString *)tag {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        id cfg = [self fetchConfiguration:manager variant:variant];
+        if (!cfg) { DWPLog(@"engine %@: doc lai variant %ld — khong lay duoc config", tag, (long)variant); return; }
+        id current = nil;
+        @try { current = [cfg valueForKey:@"wallpaperImage"]; } @catch (NSException *e) { current = nil; }
+        if ([current isKindOfClass:[UIImage class]]) {
+            UIImage *cur = (UIImage *)current;
+            BOOL same = (NSInteger)cur.size.width == (NSInteger)image.size.width &&
+                        (NSInteger)cur.size.height == (NSInteger)image.size.height;
+            DWPLog(@"engine %@: doc lai variant %ld — config dang giu anh %lux%lu, anh vua ap %lux%lu -> %@",
+                   tag, (long)variant, (unsigned long)cur.size.width, (unsigned long)cur.size.height,
+                   (unsigned long)image.size.width, (unsigned long)image.size.height,
+                   same ? @"TRUNG KICH THUOC (anh moi da vao config)" : @"KHAC (config giu anh khac)");
+        } else {
+            DWPLog(@"engine %@: doc lai variant %ld — wallpaperImage = %@", tag, (long)variant, current ?: @"nil");
+        }
+    });
+}
+
+// Duong E2 (1.0.8, theo dump 1.0.7): SBWallpaperController co method noi bo
+// _updateForLockScreenPosterConfiguration:homeScreenPosterConfiguration: —
+// duong he thong tu dung khi poster thay doi. Gan anh vao config cua tung
+// phia roi dua ca 2 config cho controller tu ap (phia khong doi thi dua
+// config hien tai nguyen ven).
++ (BOOL)applyViaPosterUpdate:(SBWallpaperController *)controller manager:(id)manager image:(UIImage *)image target:(NSInteger)target {
+    SEL sel = @selector(_updateForLockScreenPosterConfiguration:homeScreenPosterConfiguration:);
+    if (![controller respondsToSelector:sel]) {
+        DWPLog(@"engine E2: controller khong co _updateForLockScreenPosterConfiguration, bo qua");
+        return NO;
+    }
+    id lockCfg = [self fetchConfiguration:manager variant:0];
+    id homeCfg = [self fetchConfiguration:manager variant:1];
+    if (!lockCfg && !homeCfg) { DWPLog(@"engine E2: khong lay duoc config nao, bo qua"); return NO; }
+    BOOL setAny = NO;
+    if ((target == 0 || target == 2) && lockCfg) {
+        @try { [lockCfg setValue:image forKey:@"wallpaperImage"]; setAny = YES; DWPLog(@"engine E2: da gan anh vao config KHOA (variant 0)"); }
+        @catch (NSException *e) { DWPLog(@"engine E2: gan anh config khoa THAT BAI %@: %@", e.name, e.reason); }
+    }
+    if ((target == 1 || target == 2) && homeCfg) {
+        @try { [homeCfg setValue:image forKey:@"wallpaperImage"]; setAny = YES; DWPLog(@"engine E2: da gan anh vao config CHINH (variant 1)"); }
+        @catch (NSException *e) { DWPLog(@"engine E2: gan anh config chinh THAT BAI %@: %@", e.name, e.reason); }
+    }
+    if (!setAny) return NO;
+    @try {
+        [controller _updateForLockScreenPosterConfiguration:lockCfg homeScreenPosterConfiguration:homeCfg];
+        DWPLog(@"engine E2: da goi _updateForLockScreenPosterConfiguration (lock=%@, home=%@)",
+               lockCfg ? @"co" : @"nil", homeCfg ? @"co" : @"nil");
+    } @catch (NSException *e) {
+        DWPLog(@"engine E2: goi update poster NGOAI LE %@: %@", e.name, e.reason);
+        return NO;
+    }
+    if (target == 0 || target == 2) [self readBackConfiguration:manager variant:0 appliedImage:image tag:@"E2"];
+    if (target == 1 || target == 2) [self readBackConfiguration:manager variant:1 appliedImage:image tag:@"E2"];
+    return YES;
 }
 
 // Duong E1 (moi, theo dump 1.0.1): lay configuration hien tai cua tung variant
@@ -160,6 +244,11 @@
             } else {
                 DWPLog(@"engine E1: controller khong co updateWallpaperForLocations:withCompletion:");
             }
+            if (anySet) {
+                for (NSNumber *v in set) {
+                    [self readBackConfiguration:rawManager variant:[v integerValue] appliedImage:image tag:@"E1"];
+                }
+            }
             return anySet;
         }
     }
@@ -173,6 +262,13 @@
 
     BOOL ok = NO;
     ok = [self applyViaConfiguration:controller image:image target:target] || ok;
+
+    // Duong E2 (1.0.8): dua thang 2 poster configuration cho controller tu ap
+    if ([controller respondsToSelector:@selector(wallpaperConfigurationManager)]) {
+        id mgr = nil;
+        @try { mgr = [controller wallpaperConfigurationManager]; } @catch (NSException *e) { mgr = nil; }
+        if (mgr) ok = [self applyViaPosterUpdate:controller manager:mgr image:image target:target] || ok;
+    }
 
     // Cac duong legacy (1.0.1 da chung minh khong ton tai tren iOS 16.3.1,
     // giu lai re vi chi la respondsToSelector — ban sau se bo han neu E1 dung).
