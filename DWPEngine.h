@@ -1,4 +1,4 @@
-// DWPEngine.h — DailyWallpaperPro 1.0.10
+// DWPEngine.h — DailyWallpaperPro 1.0.11
 // Engine doi hinh nen tren iOS 16. Log may that cua ban 1.0.1 da chung minh:
 // SBWallpaperController KHONG con bat ky method setWallpaperWithImage nao —
 // 4 duong cu deu "selector khong ton tai". Duong moi cua ban nay dua tren
@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Duong THU NGHIEM E3 (setWallpaperImage:adjustedImage:... cua chinh
 // PBUIWallpaperConfigurationManager) — CHI goi tu nut Test engine/Test mau
 // trong Cai dat, KHONG bao gio chay tu dong (bai hoc Safe Mode cua E2 o
-// 1.0.10: duong chua chung minh khong duoc chay o duong khoi dong/tu dong).
+// 1.0.11: duong chua chung minh khong duoc chay o duong khoi dong/tu dong).
 + (BOOL)applyImageExperimental:(UIImage *)image target:(NSInteger)target;
 // Thu ap mau nen bang duong native cua he thong (chi che do mau tron).
 + (BOOL)applyColorNative:(UIColor *)color target:(NSInteger)target;

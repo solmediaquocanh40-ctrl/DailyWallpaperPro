@@ -1,4 +1,4 @@
-// DWPPhotosController.h — DailyWallpaperPro 1.0.10
+// DWPPhotosController.h — DailyWallpaperPro 1.0.11
 // Trang quan ly danh sach anh: luoi o theo ngay, chon nhieu anh cung luc,
 // doi tung anh, hoan doi vi tri giua 2 o, xoa tung o.
 

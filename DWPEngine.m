@@ -1,4 +1,4 @@
-// DWPEngine.m — DailyWallpaperPro 1.0.10
+// DWPEngine.m — DailyWallpaperPro 1.0.11
 
 #import "DWPEngine.h"
 #import "DWPShared.h"
@@ -15,6 +15,7 @@
 - (void)setWallpaperVariant:(NSInteger)variant withConfiguration:(id)configuration;
 - (id)wallpaperConfigurationManager;
 - (void)updateWallpaperForLocations:(NSInteger)locations withCompletion:(id)completion;
+- (void)_kickPosterBoard;
 - (void)wallpaperServer:(id)server setWallpaperColor:(id)color darkColor:(id)darkColor forVariants:(id)variants completionHandler:(id)handler;
 @end
 
@@ -26,7 +27,7 @@
 - (instancetype)initWithVariant:(NSInteger)variant;
 @end
 
-// Manager that tren iOS 16.3.1 (dump 1.0.10): PBUIWallpaperConfigurationManager
+// Manager that tren iOS 16.3.1 (dump 1.0.11): PBUIWallpaperConfigurationManager
 // — chua API ghi anh that vao kho nen cua he thong.
 @interface PBUIWallpaperConfigurationManager : NSObject
 - (id)wallpaperConfigurationForVariant:(NSInteger)variant includingValuesForTypes:(NSInteger)types;
@@ -35,6 +36,7 @@
 - (void)beginChangeBatch;
 - (void)endChangeBatch;
 - (NSInteger)wallpaperMode;
+- (BOOL)hasWallpaperImageForVariant:(NSInteger)variant wallpaperMode:(NSInteger)mode;
 @end
 
 @implementation DWPEngine
@@ -110,7 +112,7 @@
 // Lay configuration cua 1 variant, thu lan luot cac muc types 3 -> 0 -> -1.
 + (id)fetchConfiguration:(id)manager variant:(NSInteger)variant {
     SBFWallpaperConfigurationManager *mgr = (SBFWallpaperConfigurationManager *)manager;
-    for (NSNumber *t in @[@3, @0, @(-1)]) {
+    for (NSNumber *t in @[@(-1), @3, @0]) {
         id cfg = nil;
         @try {
             cfg = [mgr wallpaperConfigurationForVariant:variant includingValuesForTypes:[t integerValue]];
@@ -149,7 +151,7 @@
     });
 }
 
-// Duong E3 (1.0.10, theo dump 1.0.8): PBUIWallpaperConfigurationManager co
+// Duong E3 (1.0.9, theo dump 1.0.8): PBUIWallpaperConfigurationManager co
 // API ghi anh that vao kho nen cua he thong:
 //   setWallpaperImage:adjustedImage:thumbnailData:imageHashData:
 //   wallpaperOptions:forVariants:wallpaperMode:
@@ -178,10 +180,25 @@
     }
     NSInteger mode = 0;
     @try { mode = [manager wallpaperMode]; } @catch (NSException *e) { mode = 0; }
+    // MOC TRUOC KHI SET (1.0.11): lay config day du gia tri (types -1) lam
+    // moc doi chieu + lay wallpaperOptions THAT (ban 1.0.10 fetch types 3
+    // nen ca anh lan options deu nil — phep doc lai cu do sai vi thieu
+    // bitmask gia tri, khong phai vi kho khong co anh).
     NSInteger firstVariant = (target == 1) ? 1 : 0;
     id cfg = [self fetchConfiguration:manager variant:firstVariant];
     id options = nil;
     @try { options = [cfg valueForKey:@"wallpaperOptions"]; } @catch (NSException *e) { options = nil; }
+    @try {
+        UIImage *baseImg = [cfg valueForKey:@"wallpaperImage"];
+        DWPLog(@"engine E3: MOC truoc set — variant %ld wallpaperImage = %@, options = %@, hasImage(mode %ld) = %d/%d",
+               (long)firstVariant,
+               baseImg ? [NSString stringWithFormat:@"%.0fx%.0f", baseImg.size.width, baseImg.size.height] : @"nil",
+               options ? NSStringFromClass([options class]) : @"nil", (long)mode,
+               [manager hasWallpaperImageForVariant:0 wallpaperMode:mode],
+               [manager hasWallpaperImageForVariant:1 wallpaperMode:mode]);
+    } @catch (NSException *e) {
+        DWPLog(@"engine E3: moc truoc set NGOAI LE %@: %@", e.name, e.reason);
+    }
     CGSize ts = CGSizeMake(270, 480);
     UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:ts];
     UIImage *thumb = [renderer imageWithActions:^(UIGraphicsImageRendererContext *ctx) {
@@ -214,6 +231,28 @@
     } @catch (NSException *e) {
         DWPLog(@"engine E3: wallpaperDidChange NGOAI LE %@: %@", e.name, e.reason);
     }
+    // Buoc day sau set (1.0.11): nho controller cap nhat lai cac vi tri va
+    // "da" PosterBoard doc lai — lop poster cua iOS 16 co the khong tu doc
+    // lai kho PBUI neu khong co su kien nay.
+    @try {
+        if ([controller respondsToSelector:@selector(updateWallpaperForLocations:withCompletion:)]) {
+            [controller updateWallpaperForLocations:3 withCompletion:nil];
+            DWPLog(@"engine E3: da goi them updateWallpaperForLocations:3 sau set");
+        }
+        if ([controller respondsToSelector:@selector(_kickPosterBoard)]) {
+            [controller _kickPosterBoard];
+            DWPLog(@"engine E3: da goi _kickPosterBoard");
+        } else {
+            DWPLog(@"engine E3: controller khong co _kickPosterBoard");
+        }
+    } @catch (NSException *e) {
+        DWPLog(@"engine E3: buoc day sau set NGOAI LE %@: %@", e.name, e.reason);
+    }
+    @try {
+        DWPLog(@"engine E3: hasImage SAU set (mode %ld) = %d/%d", (long)mode,
+               [manager hasWallpaperImageForVariant:0 wallpaperMode:mode],
+               [manager hasWallpaperImageForVariant:1 wallpaperMode:mode]);
+    } @catch (NSException *e) { }
     if (target == 0 || target == 2) [self readBackConfiguration:manager variant:0 appliedImage:image tag:@"E3"];
     if (target == 1 || target == 2) [self readBackConfiguration:manager variant:1 appliedImage:image tag:@"E3"];
     return YES;
@@ -258,7 +297,7 @@
         for (NSNumber *v in set) {
             NSInteger variant = [v integerValue];
             id cfg = nil;
-            for (NSNumber *t in @[@3, @0, @(-1)]) {
+            for (NSNumber *t in @[@(-1), @3, @0]) {
                 @try {
                     cfg = [manager wallpaperConfigurationForVariant:variant includingValuesForTypes:[t integerValue]];
                 } @catch (NSException *e) {

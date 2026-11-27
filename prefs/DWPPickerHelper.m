@@ -1,4 +1,4 @@
-// DWPPickerHelper.m — DailyWallpaperPro 1.0.10
+// DWPPickerHelper.m — DailyWallpaperPro 1.0.11
 // Ban nay doi duong tai chinh: log 1.0.3 chung minh NSItemProvider chet
 // 0/7 vi file tam cua extension chon anh KHONG TON TAI trong container
 // PluginKitPlugin (loi -1000 "Cannot load representation of type
