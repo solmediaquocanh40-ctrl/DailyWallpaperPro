@@ -1,4 +1,4 @@
-// DWPEngine.m — DailyWallpaperPro 1.0.1
+// DWPEngine.m — DailyWallpaperPro 1.0.2
 
 #import "DWPEngine.h"
 #import "DWPShared.h"
@@ -14,6 +14,12 @@
 - (void)setWallpaperWithImage:(UIImage *)image forVariant:(NSInteger)variant;
 - (void)setWallpaperVariant:(NSInteger)variant withConfiguration:(id)configuration;
 - (id)wallpaperConfigurationManager;
+- (void)updateWallpaperForLocations:(NSInteger)locations withCompletion:(id)completion;
+- (void)wallpaperServer:(id)server setWallpaperColor:(id)color darkColor:(id)darkColor forVariants:(id)variants completionHandler:(id)handler;
+@end
+
+@interface SBFWallpaperConfigurationManager : NSObject
+- (id)wallpaperConfigurationForVariant:(NSInteger)variant includingValuesForTypes:(NSInteger)types;
 @end
 
 @interface SBFWallpaperConfiguration : NSObject
@@ -26,35 +32,51 @@
     NSArray<NSString *> *classNames = @[@"SBWallpaperController",
                                         @"SBFWallpaperConfiguration",
                                         @"SBFWallpaperConfigurationManager",
-                                        @"SBWallpaperConfigurationManager",
-                                        @"SBWallpaperView",
-                                        @"WFWallpaperConfigurationManager"];
+                                        @"SBFWallpaperOptions",
+                                        @"SBWallpaperServer",
+                                        @"PBWallpaperServer",
+                                        @"WFWallpaperServer"];
     for (NSString *name in classNames) {
         Class cls = objc_getClass([name UTF8String]);
         DWPLog(@"engine dump: class %@ = %@", name, cls ? @"CO" : @"KHONG CO");
         if (!cls) continue;
         unsigned int count = 0;
         Method *methods = class_copyMethodList(cls, &count);
-        NSInteger shown = 0;
-        for (unsigned int i = 0; i < count && shown < 60; i++) {
-            NSString *sel = NSStringFromSelector(method_getName(methods[i]));
-            NSString *low = [sel lowercaseString];
-            if ([low containsString:@"wallpaper"] || [low containsString:@"image"] || [low hasPrefix:@"set"]) {
-                DWPLog(@"engine dump:   -[%@ %@]", name, sel);
-                shown++;
-            }
+        for (unsigned int i = 0; i < count; i++) {
+            DWPLog(@"engine dump:   -[%@ %@]", name, NSStringFromSelector(method_getName(methods[i])));
         }
         if (methods) free(methods);
+        unsigned int mcount = 0;
+        Method *mmethods = class_copyMethodList(object_getClass(cls), &mcount);
+        for (unsigned int i = 0; i < mcount; i++) {
+            DWPLog(@"engine dump:   +[%@ %@]", name, NSStringFromSelector(method_getName(mmethods[i])));
+        }
+        if (mmethods) free(mmethods);
         unsigned int pcount = 0;
         objc_property_t *props = class_copyPropertyList(cls, &pcount);
-        for (unsigned int i = 0; i < pcount && i < 40; i++) {
+        for (unsigned int i = 0; i < pcount; i++) {
             DWPLog(@"engine dump:   prop %@.%s", name, property_getName(props[i]));
         }
         if (props) free(props);
+        unsigned int icount = 0;
+        Ivar *ivars = class_copyIvarList(cls, &icount);
+        for (unsigned int i = 0; i < icount; i++) {
+            DWPLog(@"engine dump:   ivar %@.%s", name, ivar_getName(ivars[i]));
+        }
+        if (ivars) free(ivars);
     }
 }
 
-// Thu 1 duong: tra YES neu selector ton tai va goi khong nem ngoai le.
++ (SBWallpaperController *)sharedController {
+    Class cls = objc_getClass("SBWallpaperController");
+    if (!cls) { DWPLog(@"engine: KHONG co class SBWallpaperController"); return nil; }
+    SBWallpaperController *controller = nil;
+    @try { controller = [cls sharedInstance]; } @catch (NSException *e) { controller = nil; }
+    if (!controller) DWPLog(@"engine: sharedInstance tra nil");
+    return controller;
+}
+
+// Thu 1 duong legacy: tra YES neu selector ton tai va goi khong nem ngoai le.
 + (BOOL)tryController:(SBWallpaperController *)controller selector:(SEL)sel logName:(NSString *)logName call:(void (^)(void))call {
     if (![controller respondsToSelector:sel]) {
         DWPLog(@"engine: duong %@ — selector khong ton tai, bo qua", logName);
@@ -70,20 +92,92 @@
     }
 }
 
+// Duong E1 (moi, theo dump 1.0.1): lay configuration hien tai cua tung variant
+// tu wallpaperConfigurationManager, gan anh vao property wallpaperImage bang
+// KVC, roi goi updateWallpaperForLocations:withCompletion: de he thong ap lai.
++ (BOOL)applyViaConfiguration:(SBWallpaperController *)controller image:(UIImage *)image target:(NSInteger)target {
+    if (![controller respondsToSelector:@selector(wallpaperConfigurationManager)]) {
+        DWPLog(@"engine E1: controller khong co wallpaperConfigurationManager, bo qua");
+        return NO;
+    }
+    id rawManager = nil;
+    @try { rawManager = [controller wallpaperConfigurationManager]; } @catch (NSException *e) {
+        DWPLog(@"engine E1: lay manager NGOAI LE %@: %@", e.name, e.reason);
+        return NO;
+    }
+    if (!rawManager) { DWPLog(@"engine E1: manager = nil"); return NO; }
+    DWPLog(@"engine E1: manager class = %@", NSStringFromClass([rawManager class]));
+    if (![rawManager respondsToSelector:@selector(wallpaperConfigurationForVariant:includingValuesForTypes:)]) {
+        DWPLog(@"engine E1: manager khong co wallpaperConfigurationForVariant:includingValuesForTypes:");
+        return NO;
+    }
+    SBFWallpaperConfigurationManager *manager = (SBFWallpaperConfigurationManager *)rawManager;
+    NSArray<NSArray<NSNumber *> *> *variantSets = nil;
+    if (target == 0) variantSets = @[@[@0], @[@1]];
+    else if (target == 1) variantSets = @[@[@1], @[@2]];
+    else variantSets = @[@[@0, @1], @[@1, @2]];
+
+    for (NSArray<NSNumber *> *set in variantSets) {
+        BOOL anyConfig = NO;
+        BOOL anySet = NO;
+        for (NSNumber *v in set) {
+            NSInteger variant = [v integerValue];
+            id cfg = nil;
+            for (NSNumber *t in @[@3, @0, @(-1)]) {
+                @try {
+                    cfg = [manager wallpaperConfigurationForVariant:variant includingValuesForTypes:[t integerValue]];
+                } @catch (NSException *e) {
+                    DWPLog(@"engine E1: lay config variant %ld types %ld NGOAI LE %@: %@", (long)variant, (long)[t integerValue], e.name, e.reason);
+                    cfg = nil;
+                }
+                if (cfg) break;
+            }
+            if (!cfg) {
+                DWPLog(@"engine E1: variant %ld khong lay duoc configuration", (long)variant);
+                continue;
+            }
+            anyConfig = YES;
+            DWPLog(@"engine E1: variant %ld configuration class = %@", (long)variant, NSStringFromClass([cfg class]));
+            @try {
+                [cfg setValue:image forKey:@"wallpaperImage"];
+                anySet = YES;
+                DWPLog(@"engine E1: variant %ld da gan wallpaperImage bang KVC", (long)variant);
+            } @catch (NSException *e) {
+                DWPLog(@"engine E1: variant %ld gan wallpaperImage THAT BAI %@: %@", (long)variant, e.name, e.reason);
+            }
+        }
+        if (anyConfig) {
+            if ([controller respondsToSelector:@selector(updateWallpaperForLocations:withCompletion:)]) {
+                NSInteger locations = (target == 0) ? 1 : (target == 1) ? 2 : 3;
+                @try {
+                    [controller updateWallpaperForLocations:locations withCompletion:^(id result) {
+                        DWPLog(@"engine E1: updateWallpaperForLocations completion da goi lai");
+                    }];
+                    DWPLog(@"engine E1: da goi updateWallpaperForLocations:%ld", (long)locations);
+                } @catch (NSException *e) {
+                    DWPLog(@"engine E1: updateWallpaper NGOAI LE %@: %@", e.name, e.reason);
+                }
+            } else {
+                DWPLog(@"engine E1: controller khong co updateWallpaperForLocations:withCompletion:");
+            }
+            return anySet;
+        }
+    }
+    return NO;
+}
+
 + (BOOL)applyImage:(UIImage *)image target:(NSInteger)target {
     if (!image) { DWPLog(@"engine: anh nil, dung"); return NO; }
-    Class cls = objc_getClass("SBWallpaperController");
-    if (!cls) { DWPLog(@"engine: KHONG co class SBWallpaperController"); return NO; }
-    SBWallpaperController *controller = nil;
-    @try { controller = [cls sharedInstance]; } @catch (NSException *e) { controller = nil; }
-    if (!controller) { DWPLog(@"engine: sharedInstance tra nil"); return NO; }
-
-    // Locations bitmask (gia thuyet pho bien): 1=Khoa, 2=Chinh, 3=Both
-    NSInteger locations = (target == 0) ? 1 : (target == 1) ? 2 : 3;
-    // Variant (gia thuyet pho bien): 1=Khoa, 2=Chinh
-    NSArray<NSNumber *> *variants = (target == 0) ? @[@1] : (target == 1) ? @[@2] : @[@1, @2];
+    SBWallpaperController *controller = [self sharedController];
+    if (!controller) return NO;
 
     BOOL ok = NO;
+    ok = [self applyViaConfiguration:controller image:image target:target] || ok;
+
+    // Cac duong legacy (1.0.1 da chung minh khong ton tai tren iOS 16.3.1,
+    // giu lai re vi chi la respondsToSelector — ban sau se bo han neu E1 dung).
+    NSInteger locations = (target == 0) ? 1 : (target == 1) ? 2 : 3;
+    NSArray<NSNumber *> *variants = (target == 0) ? @[@1] : (target == 1) ? @[@2] : @[@1, @2];
 
     ok = [self tryController:controller selector:@selector(setWallpaperForLocations:image:) logName:@"setWallpaperForLocations:image:" call:^{
         [controller setWallpaperForLocations:locations image:image];
@@ -100,8 +194,6 @@
                 [controller setWallpaperWithImage:image forVariant:variant];
             }] || ok;
         }
-    } else {
-        DWPLog(@"engine: duong setWallpaperWithImage:forVariant: — selector khong ton tai, bo qua");
     }
 
     if ([controller respondsToSelector:@selector(setWallpaperVariant:withConfiguration:)]) {
@@ -112,35 +204,50 @@
                 @try {
                     SBFWallpaperConfiguration *cfg = [[cfgCls alloc] initWithVariant:variant];
                     if (cfg) {
-                        // Chi gan anh vao property nao class that su co.
-                        unsigned int pcount = 0;
-                        objc_property_t *props = class_copyPropertyList(cfgCls, &pcount);
-                        NSMutableSet<NSString *> *propNames = [NSMutableSet set];
-                        for (unsigned int i = 0; i < pcount; i++) [propNames addObject:[NSString stringWithUTF8String:property_getName(props[i])]];
-                        if (props) free(props);
-                        for (NSString *key in @[@"image", @"wallpaperImage", @"lockScreenImage", @"homeScreenImage"]) {
-                            if ([propNames containsObject:key]) {
-                                [cfg setValue:image forKey:key];
-                                DWPLog(@"engine: config variant %ld — da gan anh vao property %@", (long)variant, key);
-                            }
-                        }
+                        [cfg setValue:image forKey:@"wallpaperImage"];
                         [controller setWallpaperVariant:variant withConfiguration:cfg];
-                        DWPLog(@"engine: duong setWallpaperVariant:%ld withConfiguration: — da goi, khong loi luc chay", (long)variant);
+                        DWPLog(@"engine: duong setWallpaperVariant:%ld withConfiguration: — da goi", (long)variant);
                         ok = YES;
                     }
                 } @catch (NSException *e) {
                     DWPLog(@"engine: duong config variant %ld — NGOAI LE %@: %@", (long)variant, e.name, e.reason);
                 }
             }
-        } else {
-            DWPLog(@"engine: duong config — KHONG co class SBFWallpaperConfiguration");
         }
-    } else {
-        DWPLog(@"engine: duong setWallpaperVariant:withConfiguration: — selector khong ton tai, bo qua");
     }
 
-    DWPLog(@"engine: tong ket apply target=%ld -> %@", (long)target, ok ? @"CO duong nhan lenh" : @"KHONG duong nao nhan lenh");
+    DWPLog(@"engine: tong ket apply anh target=%ld -> %@", (long)target, ok ? @"CO duong nhan lenh" : @"KHONG duong nao nhan lenh");
     return ok;
+}
+
++ (BOOL)applyColorNative:(UIColor *)color target:(NSInteger)target {
+    if (!color) { DWPLog(@"engine mau: mau nil, dung"); return NO; }
+    SBWallpaperController *controller = [self sharedController];
+    if (!controller) return NO;
+    SEL sel = @selector(wallpaperServer:setWallpaperColor:darkColor:forVariants:completionHandler:);
+    if (![controller respondsToSelector:sel]) {
+        DWPLog(@"engine mau: selector setWallpaperColor khong ton tai, bo qua");
+        return NO;
+    }
+    CGFloat r = 0, g = 0, b = 0, a = 1;
+    UIColor *dark = color;
+    if ([color getRed:&r green:&g blue:&b alpha:&a]) {
+        dark = [UIColor colorWithRed:r * 0.7 green:g * 0.7 blue:b * 0.7 alpha:a];
+    }
+    NSMutableIndexSet *variants = [NSMutableIndexSet indexSet];
+    if (target == 0 || target == 2) [variants addIndex:0];
+    if (target == 1 || target == 2) [variants addIndex:1];
+    DWPLog(@"engine mau: chuan bi goi setWallpaperColor variants=%@ (0=khoa, 1=chinh)", variants);
+    @try {
+        [controller wallpaperServer:nil setWallpaperColor:color darkColor:dark forVariants:variants completionHandler:^(id result) {
+            DWPLog(@"engine mau: completion da goi lai");
+        }];
+        DWPLog(@"engine mau: da goi setWallpaperColor, khong loi luc chay");
+        return YES;
+    } @catch (NSException *e) {
+        DWPLog(@"engine mau: NGOAI LE %@: %@", e.name, e.reason);
+        return NO;
+    }
 }
 
 @end

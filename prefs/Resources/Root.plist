@@ -8,7 +8,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>Tu doi hinh nen theo lich thang hoac theo khoang thoi gian anh tu set. Anh quan ly danh sach anh ngay trong trang nay.</string>
+			<string>Tự đổi hình nền theo lịch tháng hoặc theo khoảng thời gian anh tự đặt.</string>
 			<key>label</key>
 			<string>DailyWallpaper Pro</string>
 		</dict>
@@ -24,15 +24,97 @@
 			<key>key</key>
 			<string>enabled</string>
 			<key>label</key>
-			<string>Bat DailyWallpaper Pro</string>
+			<string>Bật DailyWallpaper Pro</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>language</string>
+			<key>key</key>
+			<string>language</string>
+			<key>label</key>
+			<string>Ngôn ngữ</string>
+			<key>validTitles</key>
+			<array>
+				<string>Tiếng Việt</string>
+				<string>English</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Nguồn nền</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>sourceMode</string>
+			<key>key</key>
+			<string>sourceMode</string>
+			<key>label</key>
+			<string>Nguồn nền</string>
+			<key>validTitles</key>
+			<array>
+				<string>Ảnh đã chọn</string>
+				<string>Màu trơn</string>
+				<string>Màu chuyển (gradient)</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>detail</key>
+			<string>DWPPhotosController</string>
+			<key>id</key>
+			<string>photos</string>
+			<key>isController</key>
+			<true/>
+			<key>label</key>
+			<string>Quản lý danh sách ảnh</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>pickPhotosFallback:</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>id</key>
+			<string>pickFallback</string>
+			<key>label</key>
+			<string>Chọn bộ ảnh ngay tại đây (đường dự phòng)</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>Both = doi ca man hinh khoa va man hinh chinh cung 1 anh.</string>
+			<string>Both nghĩa là đổi cả màn hình khoá và màn hình chính cùng một nền.</string>
 			<key>label</key>
-			<string>Noi doi hinh nen</string>
+			<string>Nơi đổi hình nền</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -48,12 +130,12 @@
 			<key>key</key>
 			<string>target</string>
 			<key>label</key>
-			<string>Doi o dau</string>
+			<string>Đổi ở đâu</string>
 			<key>validTitles</key>
 			<array>
-				<string>Chi man hinh khoa</string>
-				<string>Chi man hinh chinh</string>
-				<string>Ca hai (Both)</string>
+				<string>Chỉ màn hình khoá</string>
+				<string>Chỉ màn hình chính</string>
+				<string>Cả hai (Both)</string>
 			</array>
 			<key>validValues</key>
 			<array>
@@ -66,27 +148,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Danh sach anh</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
-			<key>detail</key>
-			<string>DWPPhotosController</string>
-			<key>id</key>
-			<string>photos</string>
-			<key>isController</key>
-			<true/>
-			<key>label</key>
-			<string>Quan ly danh sach anh</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>Theo lich thang: ngay may hien anh o ay, thang co bao nhieu ngay thi chon bay nhieu anh. Theo khoang thoi gian: cu het khoang la doi anh tiep theo. Tat: chi dung 1 anh co dinh.</string>
-			<key>label</key>
-			<string>Kieu tu doi</string>
+			<string>Kiểu tự đổi</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -102,12 +164,12 @@
 			<key>key</key>
 			<string>rotationMode</string>
 			<key>label</key>
-			<string>Kieu tu doi</string>
+			<string>Kiểu tự đổi</string>
 			<key>validTitles</key>
 			<array>
-				<string>Theo lich thang</string>
-				<string>Theo khoang thoi gian tu set</string>
-				<string>Tat - chi dung 1 anh</string>
+				<string>Theo lịch tháng</string>
+				<string>Theo khoảng thời gian tự đặt</string>
+				<string>Tắt — chỉ dùng 1 nền</string>
 			</array>
 			<key>validValues</key>
 			<array>
@@ -130,11 +192,11 @@
 			<key>key</key>
 			<string>orderMode</string>
 			<key>label</key>
-			<string>Thu tu (che do khoang thoi gian)</string>
+			<string>Thứ tự (chế độ khoảng thời gian)</string>
 			<key>validTitles</key>
 			<array>
-				<string>Lan luot 1, 2, 3...</string>
-				<string>Ngau nhien</string>
+				<string>Lần lượt 1, 2, 3...</string>
+				<string>Ngẫu nhiên</string>
 			</array>
 			<key>validValues</key>
 			<array>
@@ -145,10 +207,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>Qua gio nay moi ngay, anh cua ngay hom do moi duoc ap.</string>
 			<key>label</key>
-			<string>Gio bat dau ngay (che do lich thang)</string>
+			<string>Giờ bắt đầu ngày (chế độ lịch tháng)</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -164,33 +224,33 @@
 			<key>key</key>
 			<string>scheduleHour</string>
 			<key>label</key>
-			<string>Gio bat dau</string>
+			<string>Giờ bắt đầu</string>
 			<key>validTitles</key>
 			<array>
-				<string>0 gio</string>
-				<string>1 gio</string>
-				<string>2 gio</string>
-				<string>3 gio</string>
-				<string>4 gio</string>
-				<string>5 gio</string>
-				<string>6 gio</string>
-				<string>7 gio</string>
-				<string>8 gio</string>
-				<string>9 gio</string>
-				<string>10 gio</string>
-				<string>11 gio</string>
-				<string>12 gio</string>
-				<string>13 gio</string>
-				<string>14 gio</string>
-				<string>15 gio</string>
-				<string>16 gio</string>
-				<string>17 gio</string>
-				<string>18 gio</string>
-				<string>19 gio</string>
-				<string>20 gio</string>
-				<string>21 gio</string>
-				<string>22 gio</string>
-				<string>23 gio</string>
+				<string>0 giờ</string>
+				<string>1 giờ</string>
+				<string>2 giờ</string>
+				<string>3 giờ</string>
+				<string>4 giờ</string>
+				<string>5 giờ</string>
+				<string>6 giờ</string>
+				<string>7 giờ</string>
+				<string>8 giờ</string>
+				<string>9 giờ</string>
+				<string>10 giờ</string>
+				<string>11 giờ</string>
+				<string>12 giờ</string>
+				<string>13 giờ</string>
+				<string>14 giờ</string>
+				<string>15 giờ</string>
+				<string>16 giờ</string>
+				<string>17 giờ</string>
+				<string>18 giờ</string>
+				<string>19 giờ</string>
+				<string>20 giờ</string>
+				<string>21 giờ</string>
+				<string>22 giờ</string>
+				<string>23 giờ</string>
 			</array>
 			<key>validValues</key>
 			<array>
@@ -234,19 +294,19 @@
 			<key>key</key>
 			<string>scheduleMinute</string>
 			<key>label</key>
-			<string>Phut bat dau</string>
+			<string>Phút bắt đầu</string>
 			<key>validTitles</key>
 			<array>
-				<string>00 phut</string>
-				<string>05 phut</string>
-				<string>10 phut</string>
-				<string>15 phut</string>
-				<string>20 phut</string>
-				<string>30 phut</string>
-				<string>40 phut</string>
-				<string>45 phut</string>
-				<string>50 phut</string>
-				<string>55 phut</string>
+				<string>00 phút</string>
+				<string>05 phút</string>
+				<string>10 phút</string>
+				<string>15 phút</string>
+				<string>20 phút</string>
+				<string>30 phút</string>
+				<string>40 phút</string>
+				<string>45 phút</string>
+				<string>50 phút</string>
+				<string>55 phút</string>
 			</array>
 			<key>validValues</key>
 			<array>
@@ -265,10 +325,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>Vi du: 30 Phut = 30 phut doi 1 lan; 24 Gio hoac 48 Gio = 1 hoac 2 ngay doi 1 lan; 1 Thang = moi thang doi 1 lan.</string>
 			<key>label</key>
-			<string>Khoang thoi gian (che do khoang thoi gian)</string>
+			<string>Khoảng thời gian (chế độ khoảng thời gian)</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -284,7 +342,7 @@
 			<key>key</key>
 			<string>intervalValue</string>
 			<key>label</key>
-			<string>Moi (so)</string>
+			<string>Mỗi (số)</string>
 			<key>validTitles</key>
 			<array>
 				<string>1</string>
@@ -326,13 +384,13 @@
 			<key>key</key>
 			<string>intervalUnit</string>
 			<key>label</key>
-			<string>Don vi</string>
+			<string>Đơn vị</string>
 			<key>validTitles</key>
 			<array>
-				<string>Phut</string>
-				<string>Gio</string>
-				<string>Ngay</string>
-				<string>Thang</string>
+				<string>Phút</string>
+				<string>Giờ</string>
+				<string>Ngày</string>
+				<string>Tháng</string>
 			</array>
 			<key>validValues</key>
 			<array>
@@ -346,7 +404,197 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Thao tac</string>
+			<string>Màu nền</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>8</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>colorIndex</string>
+			<key>key</key>
+			<string>colorIndex</string>
+			<key>label</key>
+			<string>Màu trơn trong bảng màu</string>
+			<key>validTitles</key>
+			<array>
+				<string>Đen</string>
+				<string>Trắng</string>
+				<string>Xám</string>
+				<string>Đỏ</string>
+				<string>Cam</string>
+				<string>Vàng</string>
+				<string>Xanh lá</string>
+				<string>Xanh biển</string>
+				<string>Xanh navy</string>
+				<string>Tím</string>
+				<string>Hồng</string>
+				<string>Nâu</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+				<integer>5</integer>
+				<integer>6</integer>
+				<integer>7</integer>
+				<integer>8</integer>
+				<integer>9</integer>
+				<integer>10</integer>
+				<integer>11</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>gradientIndex</string>
+			<key>key</key>
+			<string>gradientIndex</string>
+			<key>label</key>
+			<string>Bộ màu chuyển</string>
+			<key>validTitles</key>
+			<array>
+				<string>Hoàng hôn</string>
+				<string>Biển</string>
+				<string>Rừng</string>
+				<string>Tím mộng</string>
+				<string>Đêm</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>id</key>
+			<string>colorRotate</string>
+			<key>key</key>
+			<string>colorRotate</string>
+			<key>label</key>
+			<string>Tự đổi màu theo lịch/khoảng như đổi ảnh</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>testColor:</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>id</key>
+			<string>testColor</string>
+			<key>label</key>
+			<string>Áp màu / gradient ngay để thử</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Hiệu ứng ảnh</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>darkenPercent</string>
+			<key>key</key>
+			<string>darkenPercent</string>
+			<key>label</key>
+			<string>Phủ tối (dễ đọc chữ/icon)</string>
+			<key>validTitles</key>
+			<array>
+				<string>0%</string>
+				<string>10%</string>
+				<string>20%</string>
+				<string>30%</string>
+				<string>40%</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>10</integer>
+				<integer>20</integer>
+				<integer>30</integer>
+				<integer>40</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>0</integer>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>blurLevel</string>
+			<key>key</key>
+			<string>blurLevel</string>
+			<key>label</key>
+			<string>Làm mờ ảnh</string>
+			<key>validTitles</key>
+			<array>
+				<string>Không</string>
+				<string>Nhẹ</string>
+				<string>Vừa</string>
+				<string>Mạnh</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.anhdang.dailywallpaperpro</string>
+			<key>id</key>
+			<string>lowBatteryGuard</string>
+			<key>key</key>
+			<string>lowBatteryGuard</string>
+			<key>label</key>
+			<string>Pin yếu thì tạm không đổi (dưới 20%, không sạc)</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Thao tác</string>
 		</dict>
 		<dict>
 			<key>action</key>
@@ -356,7 +604,7 @@
 			<key>id</key>
 			<string>applyNow</string>
 			<key>label</key>
-			<string>Doi anh ngay bay gio</string>
+			<string>Đổi nền ngay bây giờ</string>
 		</dict>
 		<dict>
 			<key>action</key>
@@ -366,7 +614,7 @@
 			<key>id</key>
 			<string>testEngine</string>
 			<key>label</key>
-			<string>Test engine doi nen (anh do DWP TEST)</string>
+			<string>Test engine đổi nền (ảnh đỏ DWP TEST)</string>
 		</dict>
 		<dict>
 			<key>action</key>
@@ -376,13 +624,61 @@
 			<key>id</key>
 			<string>resetState</string>
 			<key>label</key>
-			<string>Dat lai moc doi</string>
+			<string>Đặt lại mốc đổi</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Cài đặt &amp; nhật ký</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>exportSettings:</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>id</key>
+			<string>exportSettings</string>
+			<key>label</key>
+			<string>Xuất file cài đặt</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>importSettings:</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>id</key>
+			<string>importSettings</string>
+			<key>label</key>
+			<string>Nhập file cài đặt</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>detail</key>
+			<string>DWPLogViewController</string>
+			<key>id</key>
+			<string>logView</string>
+			<key>isController</key>
+			<true/>
+			<key>label</key>
+			<string>Xem nhật ký (log)</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>resetAll:</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>id</key>
+			<string>resetAll</string>
+			<key>label</key>
+			<string>Đặt lại toàn bộ cài đặt</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>DailyWallpaper Pro 1.0.1 - com.anhdang.dailywallpaperpro - Log: /var/mobile/Documents/DailyWallpaperPro.log</string>
+			<string>DailyWallpaper Pro 1.0.2 — com.anhdang.dailywallpaperpro — Log: /var/mobile/Documents/DailyWallpaperPro.log</string>
 		</dict>
 	</array>
 	<key>title</key>

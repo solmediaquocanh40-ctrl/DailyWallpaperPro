@@ -6,7 +6,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME := DailyWallpaperPro
 DailyWallpaperPro_FILES := Tweak.x DWPEngine.m DWPShared.m
-DailyWallpaperPro_FRAMEWORKS := UIKit Foundation CoreFoundation
+DailyWallpaperPro_FRAMEWORKS := UIKit Foundation CoreFoundation CoreImage
 DailyWallpaperPro_CFLAGS := -fobjc-arc
 
 SUBPROJECTS += prefs

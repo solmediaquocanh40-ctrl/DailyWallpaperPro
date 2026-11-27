@@ -1,4 +1,4 @@
-// DWPRootListController.h — DailyWallpaperPro 1.0.1
+// DWPRootListController.h — DailyWallpaperPro 1.0.2
 
 #import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>
@@ -6,5 +6,10 @@
 @interface DWPRootListController : PSListController
 - (void)applyNow:(id)sender;
 - (void)testEngine:(id)sender;
+- (void)testColor:(id)sender;
 - (void)resetState:(id)sender;
+- (void)pickPhotosFallback:(id)sender;
+- (void)exportSettings:(id)sender;
+- (void)importSettings:(id)sender;
+- (void)resetAll:(id)sender;
 @end
